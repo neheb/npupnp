@@ -91,7 +91,7 @@ size_t utf8len(const string& s)
     return len;
 }
 
-static const std::string replchar{"\xef\xbf\xbd"};
+static constexpr auto replchar = "\xef\xbf\xbd";
 
 // Check utf-8 encoding, replacing errors with the ? char above
 int utf8check(const std::string& in, bool fixit, std::string *out, int maxrepl)

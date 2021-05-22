@@ -168,7 +168,10 @@ static MHD_Result queryvalues_cb(void *cls, enum MHD_ValueKind,
 }
 
 // Use int not enum as data.second spares a map code instanciation (at least with some compilers)
-static const std::map<std::string, int> strmethtometh {
+static constexpr struct {
+    const char* first;
+    int second;
+} strmethtometh[] = {
     {"get", HTTPMETHOD_GET},
     {"head", HTTPMETHOD_HEAD},
     {"m-post", HTTPMETHOD_MPOST},
@@ -177,7 +180,7 @@ static const std::map<std::string, int> strmethtometh {
     {"post", HTTPMETHOD_POST},
     {"subscribe", HTTPMETHOD_SUBSCRIBE},
     {"unsubscribe", HTTPMETHOD_UNSUBSCRIBE},
-        };
+};
 
 void request_completed_cb(
     void *, struct MHD_Connection *,
@@ -331,15 +334,15 @@ static MHD_Result answer_to_connection(
         mhdt->version = version;
         std::string lmeth(method);
         stringtolower(lmeth);
-        const auto it = strmethtometh.find(lmeth);
-        if (it == strmethtometh.end()) {
-            mhdt->method = HTTPMETHOD_UNKNOWN;
-        } else {
-            if (it->second == HTTPMETHOD_POST &&
-                mhdt->headers.find("soapaction") != mhdt->headers.end()) {
-                mhdt->method = SOAPMETHOD_POST;
-            } else {
-                mhdt->method = http_method_t(it->second);
+        mhdt->method = HTTPMETHOD_UNKNOWN;
+        for (auto&& str : strmethtometh) {
+            if (str.first == lmeth) {
+                if (str.second == HTTPMETHOD_POST && mhdt->headers.find("soapaction") != mhdt->headers.end()) {
+                    mhdt->method = SOAPMETHOD_POST;
+                } else {
+                    mhdt->method = http_method_t(str.second);
+                }
+                break;
             }
         }
 

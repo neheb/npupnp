@@ -114,7 +114,10 @@ struct SendInstruction {
  * module variables - Globals, static and externs.
  */
 
-static const std::map<std::string, const char*> gEncodedMediaTypes = {
+static constexpr struct {
+    const char* first;
+    const char* second;
+} gEncodedMediaTypes[] = {
     {"aif", "audio/aiff"},
     {"aifc", "audio/aiff"},
     {"aiff", "audio/aiff"},
@@ -184,7 +187,7 @@ static const std::map<std::string, const char*> gEncodedMediaTypes = {
     {"xml", "text/xml"},
     {"xsl", "text/xml"},
     {"z", "application/x-compress"},
-    {"zip", "application/zip"}
+    {"zip", "application/zip"},
 };
 
 
@@ -228,9 +231,11 @@ static UPNP_INLINE int get_content_type(
     if (e) {
         e++;
         std::string le = stringtolower(e);
-        auto it = gEncodedMediaTypes.find(le);
-        if (it != gEncodedMediaTypes.end()) {
-            ctname = it->second;
+        for (auto&& type : gEncodedMediaTypes) {
+            if (type.first == le) {
+                ctname = type.second;
+                break;
+            }
         }
     }
     content_type = ctname;

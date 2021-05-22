@@ -476,7 +476,7 @@ void neutchars(const string& str, string& out, const string& chars, char rep)
  * if reasonably possible. Note: we could also use textsplit, stopping when
  * we have enough, this would be cleanly utf8-aware but would remove
  * punctuation */
-static const string cstr_SEPAR = " \t\n\r-:.;,/[]{}";
+static constexpr auto cstr_SEPAR = " \t\n\r-:.;,/[]{}";
 string truncate_to_word(const string& input, string::size_type maxlen)
 {
     string output;

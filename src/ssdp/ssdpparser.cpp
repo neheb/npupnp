@@ -44,11 +44,11 @@
 
 #define CCRLF "\r\n"
 
-static const char *notify_start = "NOTIFY * HTTP/1.1\r\n";
+static constexpr auto notify_start = "NOTIFY * HTTP/1.1\r\n";
 static const size_t notify_start_len = strlen(notify_start);
-static const char *msearch_start = "M-SEARCH * HTTP/1.1\r\n";
+static constexpr auto msearch_start = "M-SEARCH * HTTP/1.1\r\n";
 static const size_t msearch_start_len = strlen(msearch_start);
-static const char *response_start = "HTTP/1.1 200 OK\r\n";
+static constexpr auto response_start = "HTTP/1.1 200 OK\r\n";
 static const size_t response_start_len = strlen(response_start);
 
 
