@@ -2129,8 +2129,6 @@ int UpnpIsWebserverEnabled()
 
 int UpnpSetVirtualDirCallbacks(struct UpnpVirtualDirCallbacks *callbacks)
 {
-    int ret = 0;
-
     if(UpnpSdkInit != 1) {
         /* SDK is not initialized */
         return UPNP_E_FINISH;
@@ -2139,91 +2137,79 @@ int UpnpSetVirtualDirCallbacks(struct UpnpVirtualDirCallbacks *callbacks)
     if (callbacks == nullptr)
         return UPNP_E_INVALID_PARAM;
 
-    ret = UpnpVirtualDir_set_GetInfoCallback(callbacks->get_info) == UPNP_E_SUCCESS
-        && UpnpVirtualDir_set_OpenCallback(callbacks->open) == UPNP_E_SUCCESS
-        && UpnpVirtualDir_set_ReadCallback(callbacks->read) == UPNP_E_SUCCESS
-        && UpnpVirtualDir_set_WriteCallback(callbacks->write) == UPNP_E_SUCCESS
-        && UpnpVirtualDir_set_SeekCallback(callbacks->seek) == UPNP_E_SUCCESS
-        && UpnpVirtualDir_set_CloseCallback(callbacks->close) == UPNP_E_SUCCESS;
+    auto ret = UpnpVirtualDir_set_GetInfoCallback(callbacks->get_info) == UPNP_E_SUCCESS
+            && UpnpVirtualDir_set_OpenCallback(callbacks->open) == UPNP_E_SUCCESS
+            && UpnpVirtualDir_set_ReadCallback(callbacks->read) == UPNP_E_SUCCESS
+            && UpnpVirtualDir_set_WriteCallback(callbacks->write) == UPNP_E_SUCCESS
+            && UpnpVirtualDir_set_SeekCallback(callbacks->seek) == UPNP_E_SUCCESS
+            && UpnpVirtualDir_set_CloseCallback(callbacks->close) == UPNP_E_SUCCESS;
 
     return ret ? UPNP_E_SUCCESS : UPNP_E_INVALID_PARAM;
 }
 
 int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback)
 {
-    int ret = UPNP_E_SUCCESS;
     if (!callback) {
-        ret = UPNP_E_INVALID_PARAM;
-    } else {
-        virtualDirCallback.get_info = callback;
+        return UPNP_E_INVALID_PARAM;
     }
 
-    return ret;
+    virtualDirCallback.get_info = callback;
+    return UPNP_E_SUCCESS;
 }
 
 
 int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback)
 {
-    int ret = UPNP_E_SUCCESS;
     if (!callback) {
-        ret = UPNP_E_INVALID_PARAM;
-    } else {
-        virtualDirCallback.open = callback;
+        return UPNP_E_INVALID_PARAM;
     }
 
-    return ret;
+    virtualDirCallback.open = callback;
+    return UPNP_E_SUCCESS;
 }
 
 
 int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback)
 {
-    int ret = UPNP_E_SUCCESS;
     if (!callback) {
-        ret = UPNP_E_INVALID_PARAM;
-    } else {
-        virtualDirCallback.read = callback;
+        return UPNP_E_INVALID_PARAM;
     }
 
-    return ret;
+    virtualDirCallback.read = callback;
+    return UPNP_E_SUCCESS;
 }
 
 
 int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback)
 {
-    int ret = UPNP_E_SUCCESS;
     if (!callback) {
-        ret = UPNP_E_INVALID_PARAM;
-    } else {
-        virtualDirCallback.write = callback;
+        return UPNP_E_INVALID_PARAM;
     }
 
-    return ret;
+    virtualDirCallback.write = callback;
+    return UPNP_E_SUCCESS;
 }
 
 
 int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback)
 {
-    int ret = UPNP_E_SUCCESS;
     if (!callback) {
-        ret = UPNP_E_INVALID_PARAM;
-    } else {
-        virtualDirCallback.seek = callback;
+        return UPNP_E_INVALID_PARAM;
     }
 
-    return ret;
+    virtualDirCallback.seek = callback;
+    return UPNP_E_SUCCESS;
 }
 
 
 int UpnpVirtualDir_set_CloseCallback(VDCallback_Close callback)
 {
-    int ret = UPNP_E_SUCCESS;
     if (!callback) {
-        ret = UPNP_E_INVALID_PARAM;
-    } else {
-        virtualDirCallback.close = callback;
+        return UPNP_E_INVALID_PARAM;
     }
 
-    return ret;
+    virtualDirCallback.close = callback;
+    return UPNP_E_SUCCESS;
 }
 
 int UpnpSetMaxContentLength(size_t contentLength)
