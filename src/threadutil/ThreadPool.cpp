@@ -120,14 +120,9 @@ public:
     ThreadPoolStats stats;
 };
 
-
-ThreadPool::ThreadPool()
-    : m{nullptr}
-{
-}
-
-ThreadPool::~ThreadPool()
+ThreadPool::ThreadPool() = default;
 #if 0
+ThreadPool::~ThreadPool()
 {
     // JFD: Doing a proper shutdown does not work at the moment. One
     // of the threads does not exit. I suspect it's the timer thread
@@ -143,12 +138,12 @@ ThreadPool::~ThreadPool()
     delete m;
 }
 #else
-= default;
+ThreadPool::~ThreadPool() = default;
 #endif
 
 int ThreadPool::start(ThreadPoolAttr *attr)
 {
-    m = new Internal(attr);
+    m.reset(new Internal(attr));
     if (m && m->ok) {
         return 0;
     }

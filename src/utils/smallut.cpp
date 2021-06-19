@@ -1267,14 +1267,11 @@ string SimpleRegexp::getMatch(const string& val, int i) const
 #endif // !windows, using C regexps
 
 SimpleRegexp::SimpleRegexp(const string& exp, int flags, int nmatch)
-    : m(new Internal(exp, flags, nmatch))
 {
+    m.reset(new Internal(exp, flags, nmatch));
 }
 
-SimpleRegexp::~SimpleRegexp()
-{
-    delete m;
-}
+SimpleRegexp::~SimpleRegexp() = default;
 
 bool SimpleRegexp::ok() const
 {
