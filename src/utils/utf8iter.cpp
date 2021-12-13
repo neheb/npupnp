@@ -96,8 +96,8 @@ static const std::string replchar{"\xef\xbf\xbd"};
 int utf8check(const std::string& in, bool fixit, std::string *out, int maxrepl)
 {
     int cnt = 0;
-    Utf8Iter it(in);
-    for (;!it.eof(); it++) {
+    auto it = Utf8Iter(in);
+    while (!it.eof()) {
         if (it.error()) {
             if (!fixit) {
                 return -1;
@@ -120,6 +120,7 @@ int utf8check(const std::string& in, bool fixit, std::string *out, int maxrepl)
         if (fixit) {
             it.appendchartostring(*out);
         }
+        it++;
     }
     return cnt;
 }

@@ -264,7 +264,7 @@ std::string remove_escaped_chars(const std::string& in)
     std::string out;
     out.reserve(in.size());
     size_t i = 0;
-    for (; i < in.size() - 2; i++) {
+    while (i < in.size() - 2) {
         if (in[i] == '%') {
             int d1 = h2d(in[i+1]);
             int d2 = h2d(in[i+2]);
@@ -279,6 +279,7 @@ std::string remove_escaped_chars(const std::string& in)
         } else {
             out += in[i];
         }
+        ++i;
     }
     while (i < in.size()) {
         out += in[i++];
