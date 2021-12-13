@@ -692,7 +692,7 @@ static int available_port(int reqport)
     return ret;
 }
 
-static void mhdlogger(void *, const char *fmt, va_list ap)
+[[gnu::format(printf, 2, 0)]] static void mhdlogger(void*, const char* fmt, va_list ap)
 {
     char buf[1024];
     vsnprintf(buf, 1023, fmt, ap);
