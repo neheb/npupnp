@@ -133,7 +133,7 @@ protected:
     public:
         explicit StackEl(const char* nm) : name(nm) {}
         std::string name;
-        XML_Size start_index;
+        XML_Size start_index{};
         std::map<std::string,std::string> attributes;
         std::string data;
     };
