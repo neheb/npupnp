@@ -78,7 +78,7 @@ struct Handle_Info
     /*! . */
     char *Cookie{nullptr};
     /*! 0 = not installed; otherwise installed. */
-    int   aliasInstalled;
+    int aliasInstalled {};
 
     /* Device Only */
 #ifdef INCLUDE_DEVICE_APIS
