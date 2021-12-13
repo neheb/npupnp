@@ -460,8 +460,8 @@ static int process_request(
     struct SendInstruction *RespInstr)
 {
     struct File_Info finfo;
-    LocalDoc localdoc;
-    
+    LocalDoc localdoc{};
+
     assert(mhdt->method == HTTPMETHOD_GET ||
            mhdt->method == HTTPMETHOD_HEAD ||
            mhdt->method == HTTPMETHOD_POST ||
