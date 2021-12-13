@@ -276,10 +276,7 @@ static int get_file_info(const char *filename, struct File_Info *info)
     else
         return -1;
     /* check readable */
-    FILE *fp = fopen(filename, "r");
-    info->is_readable = (fp != nullptr);
-    if (fp)
-        fclose(fp);
+    info->is_readable = (access(filename, R_OK) == 0);
     info->file_length = s.st_size;
     info->last_modified = s.st_mtime;
     int rc = get_content_type(filename, info->content_type);
