@@ -57,9 +57,9 @@
 #include "httputils.h"
 #include "genut.h"
 
-#define SREQ_HDR_NOT_FOUND     -1
-#define SREQ_BAD_HDR_FORMAT     -2
-#define SREQ_NOT_EXTENDED     -3
+#define SREQ_HDR_NOT_FOUND     (-1)
+#define SREQ_BAD_HDR_FORMAT     (-2)
+#define SREQ_NOT_EXTENDED     (-3)
 
 #define SOAP_INVALID_ACTION 401
 #define SOAP_INVALID_ARGS    402

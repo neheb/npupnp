@@ -44,7 +44,7 @@ void smallut_init_mt();
 #define MAX(A,B) (((A)>(B)) ? (A) : (B))
 #endif
 #ifndef deleteZ
-#define deleteZ(X) {delete X;X = nullptr;}
+#define deleteZ(X) {delete (X);(X) = nullptr;}
 #endif
 #ifndef PRETEND_USE
 #define PRETEND_USE(var) ((void)(var))

@@ -88,7 +88,7 @@ public:
 };
 
 /* different types of HTTP headers */
-#define HDR_UNKNOWN            -1
+#define HDR_UNKNOWN            (-1)
 #define HDR_CACHE_CONTROL        1
 #define HDR_CALLBACK            2
 #define HDR_CONTENT_LENGTH        3

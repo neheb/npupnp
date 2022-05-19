@@ -87,7 +87,7 @@ static FILE *logfp;
 #define LOGERR(X) do {                                              \
         if (logfp) {                                                \
             std::ostringstream oss;                                 \
-            oss << X;                                               \
+            oss << (X);                                               \
             fprintf(logfp, "%s", oss.str().c_str());                \
         }                                                           \
     } while (0)

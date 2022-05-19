@@ -51,14 +51,14 @@
 /** Array size for some fixed sized character arrays in API structures */
 #define NAME_SIZE  size_t(256)
 /** Value indicating a non-limited specification in some calls (e.g. timeout) */
-#define UPNP_INFINITE        -1
+#define UPNP_INFINITE        (-1)
 /** This can be set in the file_length field of a File_Info structure
  *  to indicate that the web server should use chunked encoding. In npupnp practise,
  *  we set the length to -1 and let microhttpd do its thing.
  */
-#define UPNP_USING_CHUNKED -3
+#define UPNP_USING_CHUNKED (-3)
 /** I don't think that this is actually used in the API, but define it for compatibility */
-#define UPNP_UNTIL_CLOSE -4
+#define UPNP_UNTIL_CLOSE (-4)
 
 
 /**
@@ -77,67 +77,67 @@
 #define UPNP_E_SUCCESS            0
 
 /** @brief Not a valid handle. */
-#define UPNP_E_INVALID_HANDLE        -100
+#define UPNP_E_INVALID_HANDLE        (-100)
 
 /** @brief One or more of the parameters passed to the function is not valid. */
-#define UPNP_E_INVALID_PARAM        -101
+#define UPNP_E_INVALID_PARAM        (-101)
 
 /** @brief The SDK does not have any more space for additional handles. */
-#define UPNP_E_OUTOF_HANDLE        -102
+#define UPNP_E_OUTOF_HANDLE        (-102)
 
 /** @brief Not used */
-#define UPNP_E_OUTOF_CONTEXT        -103
+#define UPNP_E_OUTOF_CONTEXT        (-103)
 
 /** @brief Insufficient resources available to complete the operation. */
-#define UPNP_E_OUTOF_MEMORY        -104
+#define UPNP_E_OUTOF_MEMORY        (-104)
 
 /** @brief The SDK has already been initialized. */
-#define UPNP_E_INIT            -105
+#define UPNP_E_INIT            (-105)
 
 /** @brief Not used */
-#define UPNP_E_BUFFER_TOO_SMALL        -106
+#define UPNP_E_BUFFER_TOO_SMALL        (-106)
 
 /** @brief The description document passed to \ref UpnpRegisterRootDevice,
  * \ref UpnpRegisterRootDevice2 or \ref UpnpRegisterRootDevice4 is invalid. */
-#define UPNP_E_INVALID_DESC        -107
+#define UPNP_E_INVALID_DESC        (-107)
 
 /** @brief An URL passed into the function is invalid. */
-#define UPNP_E_INVALID_URL        -108
+#define UPNP_E_INVALID_URL        (-108)
 
 /** @brief Invalid subscription identifier */
-#define UPNP_E_INVALID_SID        -109
+#define UPNP_E_INVALID_SID        (-109)
 
 /** @brief Not used currently */
-#define UPNP_E_INVALID_DEVICE        -110
+#define UPNP_E_INVALID_DEVICE        (-110)
 
 /** @brief The device ID/service ID pair does not refer to a valid service */
-#define UPNP_E_INVALID_SERVICE        -111
+#define UPNP_E_INVALID_SERVICE        (-111)
 
 /** @brief The response received from the remote side of a connection is 
  * not correct for the protocol (GENA, SOAP, and HTTP). */
-#define UPNP_E_BAD_RESPONSE        -113
+#define UPNP_E_BAD_RESPONSE        (-113)
 
 /** @brief Not used */
-#define UPNP_E_BAD_REQUEST        -114
+#define UPNP_E_BAD_REQUEST        (-114)
 
 /** @brief The SOAP action message is invalid.
  * This can be because the DOM document passed to the function was malformed or
  * the action message is not correct for the given action. */
-#define UPNP_E_INVALID_ACTION        -115
+#define UPNP_E_INVALID_ACTION        (-115)
 
 /** @brief @ref UpnpInit has not been called, or @ref UpnpFinish has 
  * already been called.
  * None of the API functions operate until @ref UpnpInit successfully completes.
  */
-#define UPNP_E_FINISH            -116
+#define UPNP_E_FINISH            (-116)
 
 /** @brief @ref UpnpInit cannot complete.  
  * The typical reason is failure to allocate sufficient resources. */
-#define UPNP_E_INIT_FAILED        -117
+#define UPNP_E_INIT_FAILED        (-117)
 
 /** @brief The URL passed into a function is too long.
  * The SDK limits URLs to @ref LINE_SIZE characters in length. */
-#define UPNP_E_URL_TOO_BIG        -118
+#define UPNP_E_URL_TOO_BIG        (-118)
 
 /** @brief The HTTP message contains invalid message headers.
  *
@@ -147,7 +147,7 @@
  * GENA event notifications (e.g. @ref UpnpNotify), and HTTP transfers (e.g.
  * @ref UpnpDownloadUrlItem).
  */
-#define UPNP_E_BAD_HTTPMSG        -119
+#define UPNP_E_BAD_HTTPMSG        (-119)
 
 /**
  * @brief A client or a device is already registered.
@@ -155,11 +155,11 @@
  * The SDK currently has a limit of one registered client and one registered
  * device per process.
  */
-#define UPNP_E_ALREADY_REGISTERED    -120
+#define UPNP_E_ALREADY_REGISTERED    (-120)
 
 /** @brief The interface provided to @ref UpnpInit2 is unknown or does not 
  * have a valid IPv4 or IPv6 address configured. */
-#define UPNP_E_INVALID_INTERFACE    -121
+#define UPNP_E_INVALID_INTERFACE    (-121)
 
 /**
  * @brief A network error occurred.
@@ -168,7 +168,7 @@
  * one of the more specific error codes.  The typical meaning is the SDK failed
  * to read the local IP address or had problems configuring one of the sockets.
  */
-#define UPNP_E_NETWORK_ERROR        -200
+#define UPNP_E_NETWORK_ERROR        (-200)
 
 /**
  * @brief An error happened while writing to a socket.
@@ -178,7 +178,7 @@
  * (e.g.@ref UpnpSendAction), eventing (e.g. @ref UpnpNotify), and
  * HTTP functions (e.g. @ref UpnpDownloadUrlItem).
  */
-#define UPNP_E_SOCKET_WRITE        -201
+#define UPNP_E_SOCKET_WRITE        (-201)
 
 /**
  * @brief An error happened while reading from a socket.
@@ -188,7 +188,7 @@
  * @ref UpnpSendAction), eventing (e.g. @ref UpnpNotify), and HTTP functions (e.g.
  * @ref UpnpDownloadUrlItem).
  */
-#define UPNP_E_SOCKET_READ        -202
+#define UPNP_E_SOCKET_READ        (-202)
 
 /**
  * @brief The SDK had a problem binding a socket to a network interface.
@@ -198,7 +198,7 @@
  * @ref UpnpSendAction), eventing (e.g. @ref UpnpNotify), and HTTP
  * functions (e.g. @ref UpnpDownloadUrlItem).
  */
-#define UPNP_E_SOCKET_BIND        -203
+#define UPNP_E_SOCKET_BIND        (-203)
 
 /**
  * @brief The SDK had a problem connecting to a remote host.
@@ -208,7 +208,7 @@
  * @ref UpnpSendAction), eventing (e.g. @ref UpnpNotify), and HTTP
  * functions (e.g. @ref UpnpDownloadUrlItem).
  */
-#define UPNP_E_SOCKET_CONNECT        -204
+#define UPNP_E_SOCKET_CONNECT        (-204)
 
 /**
  * @brief The SDK cannot create any more sockets.
@@ -218,11 +218,11 @@
  * @ref UpnpSendAction), eventing (e.g. @ref UpnpNotify), and HTTP
  * functions (e.g. @ref UpnpDownloadUrlItem).
  */
-#define UPNP_E_OUTOF_SOCKET        -205
+#define UPNP_E_OUTOF_SOCKET        (-205)
 
 /** @brief While initializing, the SDK could not create or set up the
  *  listening socket. */
-#define UPNP_E_LISTEN            -206
+#define UPNP_E_LISTEN            (-206)
 
 /**
  * @brief Too much time elapsed before the required number of bytes were sent
@@ -230,7 +230,7 @@
  *
  * This error can be returned by any function that performs network operations.
  */
-#define UPNP_E_TIMEDOUT            -207
+#define UPNP_E_TIMEDOUT            (-207)
 
 /**
  * @brief Generic socket error code for conditions not covered by other error
@@ -238,52 +238,52 @@
  *
  * This error can be returned by any function that performs network operations.
  */
-#define UPNP_E_SOCKET_ERROR        -208
+#define UPNP_E_SOCKET_ERROR        (-208)
 
 /** @brief Not used */
-#define UPNP_E_FILE_WRITE_ERROR        -209
+#define UPNP_E_FILE_WRITE_ERROR        (-209)
 
 /** @brief Not used */
-#define UPNP_E_CANCELED            -210
+#define UPNP_E_CANCELED            (-210)
 
 /** @brief Not used */
-#define UPNP_E_EVENT_PROTOCOL        -300
+#define UPNP_E_EVENT_PROTOCOL        (-300)
 
 /** @brief A subscription request was rejected from the remote side. */
-#define UPNP_E_SUBSCRIBE_UNACCEPTED    -301
+#define UPNP_E_SUBSCRIBE_UNACCEPTED    (-301)
 
 /** @brief An unsubscribe request was rejected from the remote side. */
-#define UPNP_E_UNSUBSCRIBE_UNACCEPTED    -302
+#define UPNP_E_UNSUBSCRIBE_UNACCEPTED    (-302)
 
 /** @brief The remote host did not accept the notify sent from the local device.*/
-#define UPNP_E_NOTIFY_UNACCEPTED    -303
+#define UPNP_E_NOTIFY_UNACCEPTED    (-303)
 
 /** @brief One or more of the parameters passed to a function is invalid. */
-#define UPNP_E_INVALID_ARGUMENT        -501
+#define UPNP_E_INVALID_ARGUMENT        (-501)
 
 /** @brief The filename passed to one of the device registration functions was
  * not found or was not accessible. */
-#define UPNP_E_FILE_NOT_FOUND        -502
+#define UPNP_E_FILE_NOT_FOUND        (-502)
 
 /** @brief An error happened while reading a file. */
-#define UPNP_E_FILE_READ_ERROR        -503
+#define UPNP_E_FILE_READ_ERROR        (-503)
 
 /** @brief The file name of the description document passed to
  * @ref UpnpRegisterRootDevice2 does not end in ".xml". */
-#define UPNP_E_EXT_NOT_XML        -504
+#define UPNP_E_EXT_NOT_XML        (-504)
 
 /** @brief A function needs the internal Web server but it is not running */
-#define UPNP_E_NO_WEB_SERVER        -505
+#define UPNP_E_NO_WEB_SERVER        (-505)
 
 /** @brief Not used */
-#define UPNP_E_OUTOF_BOUNDS        -506
+#define UPNP_E_OUTOF_BOUNDS        (-506)
 
 /** @brief Not used */
-#define UPNP_E_NOT_FOUND        -507
+#define UPNP_E_NOT_FOUND        (-507)
 
 /** @brief Generic error code for internal conditions not covered by other
  * error codes. */
-#define UPNP_E_INTERNAL_ERROR        -911
+#define UPNP_E_INTERNAL_ERROR        (-911)
 
 /* SOAP-related error codes */
 #define UPNP_SOAP_E_INVALID_ACTION   401

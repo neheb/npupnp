@@ -86,10 +86,10 @@
 
 /* HTTP lib error codes */
 
-#define HTTP_E_OUT_OF_MEMORY    -2
-#define HTTP_E_BAD_MSG_FORMAT   -3
-#define HTTP_E_TIMEDOUT         -4
-#define HTTP_E_FILE_READ        -5
+#define HTTP_E_OUT_OF_MEMORY    (-2)
+#define HTTP_E_BAD_MSG_FORMAT   (-3)
+#define HTTP_E_TIMEDOUT         (-4)
+#define HTTP_E_FILE_READ        (-5)
 
 /************************************************************************
 * Function: http_get_code_text                                            
