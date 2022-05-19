@@ -266,7 +266,7 @@ static int getIfInfo(const char *IfNames)
         filt.needs=needed;
         filt.rejects={NetIF::Interface::Flags::LOOPBACK};
 
-        selected = ifs->select(filt);
+        selected = NetIF::Interfaces::select(filt);
         if (!selected.empty() && !g_use_all_interfaces) {
             selected.resize(1);
         }
@@ -338,7 +338,6 @@ static int getIfInfo(const char *IfNames)
 static int getmyipv4(const char *inipv4 = nullptr)
 {
     bool ipspecified = (nullptr != inipv4 && 0 != inipv4[0]);
-    NetIF::Interfaces *ifs = NetIF::Interfaces::theInterfaces();
     NetIF::Interface *netifp{nullptr};
     NetIF::Interfaces::Filter filt;
     filt.needs = {NetIF::Interface::Flags::HASIPV4,
@@ -346,7 +345,7 @@ static int getmyipv4(const char *inipv4 = nullptr)
                   NetIF::Interface::Flags::MULTICAST};
     filt.rejects = {NetIF::Interface::Flags::LOOPBACK};
 
-    std::vector<NetIF::Interface> selected = ifs->select(filt);
+    std::vector<NetIF::Interface> selected = NetIF::Interfaces::select(filt);
     if (selected.empty()) {
         UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__,
                    "No adapter with usable IPV4 address.\n");
@@ -618,8 +617,7 @@ static int upnpInitCommon(const char *hostIP, const char *ifName,
 
     {
         std::ostringstream ifdump;
-        NetIF::Interfaces *ifs = NetIF::Interfaces::theInterfaces();
-        ifs->print(ifdump);
+        NetIF::Interfaces::print(ifdump);
         UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__,
                    "All network interfaces:\n%s\n", ifdump.str().c_str());
     }

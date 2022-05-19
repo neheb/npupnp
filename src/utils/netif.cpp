@@ -792,7 +792,7 @@ std::ostream& Interfaces::print(std::ostream& out) {
     return out;
 }
 
-std::vector<Interface> Interfaces::select(const Filter& filt) const
+std::vector<Interface> Interfaces::select(const Filter& filt)
 {
     uint32_t yesflags = std::accumulate(filt.needs.begin(), filt.needs.end(), 0,
         [](uint32_t yes, const NetIF::Interface::Flags &f){ return yes | static_cast<unsigned int>(f); });

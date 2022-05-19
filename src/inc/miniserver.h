@@ -70,7 +70,8 @@ struct MiniServerSockArray {
     MiniServerSockArray& operator=(const MiniServerSockArray&) = delete;
 
 private:
-    void maybeClose(SOCKET s) {
+    static void maybeClose(SOCKET s)
+    {
         if (s != INVALID_SOCKET) {
             UpnpCloseSocket(s);
         }

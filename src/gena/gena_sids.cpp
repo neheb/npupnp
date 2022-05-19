@@ -67,18 +67,17 @@ std::string gena_sid_uuid()
 
     static std::string hwaddr;
     if (hwaddr.empty()) {
-        NetIF::Interfaces *ifs = NetIF::Interfaces::theInterfaces();
         NetIF::Interfaces::Filter filt;
             filt.needs = {NetIF::Interface::Flags::HASHWADDR,
                           NetIF::Interface::Flags::HASIPV4};
             filt.rejects = {NetIF::Interface::Flags::LOOPBACK};
 
-        auto selected = ifs->select(filt);
-        for (const auto& entry : selected) {
-            hwaddr = entry.gethexhwaddr();
-            if (!hwaddr.empty()) {
-                break;
-            }
+            auto selected = NetIF::Interfaces::select(filt);
+            for (const auto& entry : selected) {
+                hwaddr = entry.gethexhwaddr();
+                if (!hwaddr.empty()) {
+                    break;
+                }
         }
         if (hwaddr.empty()) {
             srand(static_cast<unsigned int>(tp & 0xffffffff));

@@ -191,10 +191,10 @@ public:
     };
 
     /** @brief Return Interface objects satisfying the criteria in f. */
-    std::vector<Interface> select(const Filter& f) const;
-    
+    static std::vector<Interface> select(const Filter& f);
+
     /** @brief Print out, a bit like "ip addr" output */
-    std::ostream& print(std::ostream&);
+    static std::ostream& print(std::ostream&);
 
     /** @brief Find the interface to which the input address' subnet
      * belongs to in a vector of @ref Interface.
