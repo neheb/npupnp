@@ -59,8 +59,8 @@
 #include "uri.h"
 #include "upnpapi.h"
 
-static const std::string bogus_soap_post{"SMPOST"};
-static const std::map<std::string, int> Http_Method_Table {
+static constexpr auto bogus_soap_post = "SMPOST";
+static constexpr std::pair<const char*, int> Http_Method_Table[]{
     {"GET", HTTPMETHOD_GET},
     {"HEAD", HTTPMETHOD_HEAD},
     {"M-POST", HTTPMETHOD_MPOST},
@@ -136,12 +136,11 @@ bool MHDTransaction::copyHeader(const std::string& name,
 
 http_method_t httpmethod_str2enum(const char *methname)
 {
-    const auto it = Http_Method_Table.find(methname);
-    if (it == Http_Method_Table.end()) {
-        return HTTPMETHOD_UNKNOWN;
-    }
+    for (auto&& method : Http_Method_Table)
+        if (method.first == methname)
+            return static_cast<http_method_t>(method.second);
 
-    return static_cast<http_method_t>(it->second);
+    return HTTPMETHOD_UNKNOWN;
 }
 
 int httpheader_str2int(const std::string& headername)
