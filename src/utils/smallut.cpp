@@ -1182,7 +1182,7 @@ void catstrerror(std::string *reason, const char *what, int _errno)
     // changing the cxxflags globally, so forget it. Recent gnu lib versions
     // normally default to the posix version. (not !)
     // The feature defines tests are too complicated and seem unreliable.
-    // In short it's a mess, but thanks to c++ function overloading and smart 
+    // In short it's a mess, but thanks to c++ function overloading and smart
     // people, we have a solution:
     // https://www.zverovich.net/2015/03/13/reliable-detection-of-strerror-variants.html
     char errbuf[200];
@@ -1364,12 +1364,11 @@ std::string valToString(const std::vector<CharFlags>& flags, unsigned int val)
 static inline int h2d(int c) {
     if ('0' <= c && c <= '9')
         return c - '0';
-    else if ('A' <= c && c <= 'F')
+    if ('A' <= c && c <= 'F')
         return 10 + c - 'A';
-    else if ('a' <= c && c <= 'f')
+    if ('a' <= c && c <= 'f')
         return 10 + c - 'a';
-    else 
-        return -1;
+    return -1;
 }
 
 

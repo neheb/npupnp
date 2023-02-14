@@ -117,7 +117,7 @@ private:
 static int
 get_response_value(
     const std::string& payload, long http_status, const std::string& cttype,
-    const std::string& rspname, 
+    const std::string& rspname,
     std::vector<std::pair<std::string, std::string>>& rspdata,
     int *errcodep, std::string& errdesc)
 {
@@ -194,7 +194,7 @@ int SoapSendAction(
             arg.first << ">\n";
     }
     act << "</u:" << actionName << ">\n";
-    
+
     /* parse url */
     uri_type url;
     if (http_FixStrUrl(actionURL, &url) != 0) {
@@ -210,7 +210,7 @@ int SoapSendAction(
         payload += xml_header_start + xml_header_str + xml_header_end;
     }
     payload += xml_body_start + act.str() + xml_end;
-    
+
     std::string soapaction = std::string(R"(SOAPACTION: ")") + serviceType + "#" +
         actionName + R"(")";
 
@@ -232,7 +232,7 @@ int SoapSendAction(
         curl_easy_setopt(easy, CURLOPT_HEADERDATA, &http_headers);
         curl_easy_setopt(easy, CURLOPT_TIMEOUT_MS, timeoutms);
         curl_easy_setopt(easy, CURLOPT_POST, long(1));
-        curl_easy_setopt(easy, CURLOPT_POSTFIELDS, payload.c_str()); 
+        curl_easy_setopt(easy, CURLOPT_POSTFIELDS, payload.c_str());
         struct curl_slist *list = nullptr;
         list = curl_slist_append(list, R"(Content-Type: text/xml; charset="utf-8")");
         list = curl_slist_append(list, soapaction.c_str());
@@ -283,11 +283,10 @@ int SoapSendAction(
                "soapSendAction: http_stt [%ld] errcode %d errdesc[%s]\n",
                http_status, *errcodep, errdesc.c_str());
 
-    if (ret_code == SOAP_ACTION_RESP) {
+    if (ret_code == SOAP_ACTION_RESP)
         return UPNP_E_SUCCESS;
-    } else if (ret_code == SOAP_ACTION_RESP_ERROR ) {
+    if (ret_code == SOAP_ACTION_RESP_ERROR)
         return *errcodep;
-    }
     return ret_code;
 }
 

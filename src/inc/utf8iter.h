@@ -23,16 +23,16 @@
 #include <string>
 #include <cstdint>
 
-/** 
+/**
  * A small helper class to iterate over utf8 strings. This is not an
  * STL iterator and does not much error checking. It is designed purely
  * for recoll usage, where the utf-8 string comes out of iconv in most cases
- * and is assumed legal. We just try to catch cases where there would be 
+ * and is assumed legal. We just try to catch cases where there would be
  * a risk of crash.
  */
 class Utf8Iter {
 public:
-    explicit Utf8Iter(const std::string &in) 
+    explicit Utf8Iter(const std::string &in)
         : m_sp(&in) {
         update_cl();
     }
@@ -40,11 +40,11 @@ public:
     const std::string& buffer() const {
         return *m_sp;
     }
-    
+
     void rewind() {
-        m_cl = 0; 
-        m_pos = 0; 
-        m_charpos = 0; 
+        m_cl = 0;
+        m_pos = 0;
+        m_charpos = 0;
         update_cl();
     }
 
@@ -57,7 +57,7 @@ public:
         }
         update_cl();
     }
-    
+
     /** "Direct" access. Awfully inefficient as we skip from start or current
      * position at best. This can only be useful for a lookahead from the
      * current position */
@@ -151,14 +151,14 @@ public:
 
 private:
     // String we're working with
-    const std::string*     m_sp; 
+    const std::string*     m_sp;
     // Character length at current position. A value of zero indicates
     // an error.
     unsigned int m_cl{0};
     // Current byte offset in string.
-    std::string::size_type m_pos{0}; 
+    std::string::size_type m_pos{0};
     // Current character position
-    unsigned int      m_charpos{0}; 
+    unsigned int      m_charpos{0};
 
     // Check position and cl against string length
     bool poslok(std::string::size_type p, int l) const {
@@ -186,17 +186,17 @@ private:
 
     inline bool checkvalidat(std::string::size_type p, int l) const {
         switch (l) {
-        case 1: 
+        case 1:
             return uint8_t((*m_sp)[p]) < 128;
-        case 2: 
+        case 2:
             return uint8_t((*m_sp)[p] & 224) == 192
                                                && uint8_t((*m_sp)[p+1] & 192) == 128;
-        case 3: 
+        case 3:
             return uint8_t((*m_sp)[p] & 240) == 224
                                                && uint8_t((*m_sp)[p+1] & 192) ==  128
                                                && uint8_t((*m_sp)[p+2] & 192) ==  128
                                                ;
-        case 4: 
+        case 4:
             return uint8_t((*m_sp)[p] & 248) == 240
                                                && uint8_t((*m_sp)[p+1] & 192) ==  128
                                                && uint8_t((*m_sp)[p+2] & 192) ==  128
@@ -210,15 +210,14 @@ private:
     // Get character byte length at specified position. Returns 0 for error.
     inline int get_cl(std::string::size_type p) const {
         unsigned int z = uint8_t((*m_sp)[p]);
-        if (z <= 127) {
+        if (z <= 127)
             return 1;
-        } else if ((z & 224) == 192) {
+        if ((z & 224) == 192)
             return 2;
-        } else if ((z & 240) == 224) {
+        if ((z & 240) == 224)
             return 3;
-        } else if ((z & 248) == 240) {
+        if ((z & 248) == 240)
             return 4;
-        }
 #ifdef UTF8ITER_CHECK
         assert(z <= 127 || (z & 224) == 192 || (z & 240) == 224 ||
                (z & 248) == 240);
@@ -229,21 +228,21 @@ private:
     // Compute value at given position. No error checking.
     inline unsigned int getvalueat(std::string::size_type p, int l) const {
         switch (l) {
-        case 1: 
+        case 1:
 #ifdef UTF8ITER_CHECK
             assert((unsigned char)(*m_sp)[p] < 128);
 #endif
             return uint8_t((*m_sp)[p]);
-        case 2: 
+        case 2:
 #ifdef UTF8ITER_CHECK
             assert(
                 uint8_t((*m_sp)[p] & 224) == 192
                 && ((unsigned char)(*m_sp)[p+1] & 192) ==  128
                 );
 #endif
-            return uint8_t((*m_sp)[p] - 192) * 64 + 
+            return uint8_t((*m_sp)[p] - 192) * 64 +
                 uint8_t((*m_sp)[p+1] - 128);
-        case 3: 
+        case 3:
 #ifdef UTF8ITER_CHECK
             assert(
                 (((unsigned char)(*m_sp)[p]) & 240) == 224
@@ -252,10 +251,10 @@ private:
                 );
 #endif
 
-            return uint8_t((*m_sp)[p] - 224) * 4096 + 
-                uint8_t((*m_sp)[p+1] - 128) * 64 + 
+            return uint8_t((*m_sp)[p] - 224) * 4096 +
+                uint8_t((*m_sp)[p+1] - 128) * 64 +
                 uint8_t((*m_sp)[p+2] - 128);
-        case 4: 
+        case 4:
 #ifdef UTF8ITER_CHECK
             assert(
                 uint8_t((*m_sp)[p] & 248) == 240
@@ -265,9 +264,9 @@ private:
                 );
 #endif
 
-            return uint8_t((*m_sp)[p]-240)*262144 + 
-                uint8_t((*m_sp)[p+1]-128)*4096 + 
-                uint8_t((*m_sp)[p+2]-128)*64 + 
+            return uint8_t((*m_sp)[p]-240)*262144 +
+                uint8_t((*m_sp)[p+1]-128)*4096 +
+                uint8_t((*m_sp)[p+2]-128)*64 +
                 uint8_t((*m_sp)[p+3]-128);
 
         default:
@@ -298,15 +297,13 @@ size_t utf8len(const std::string& s);
 /** Return number of bytes for Unicode character */
 inline int utf8codepointsize(uint32_t codepoint)
 {
-    if (codepoint <= 0x7F) {
+    if (codepoint <= 0x7F)
         return 1;
-    } else if (codepoint <= 0x7FF) {
+    if (codepoint <= 0x7FF)
         return 2;
-    } else if (codepoint < 0xFFFF) {
+    if (codepoint < 0xFFFF)
         return 3;
-    } else {
-        return 4;
-    }
+    return 4;
 }
 
 /** @brief Check and possibly fix string by replacing badly encoded
@@ -316,7 +313,7 @@ inline int utf8codepointsize(uint32_t codepoint)
  * @param[out] if fixit is true, the fixed output string
  * @param fixit if true, copy a fixed string to out
  * @param maxrepl maximum replacements before we bail out
- * @return -1 for failure (fixit false or maxrepl reached). 
+ * @return -1 for failure (fixit false or maxrepl reached).
  *   0 or positive: replacement count.
  */
 int utf8check(
