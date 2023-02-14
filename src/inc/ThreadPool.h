@@ -37,7 +37,6 @@
 #include <list>
 #include <memory>
 #include <string>
-#include <memory>
 
 #include <errno.h>
 #ifdef __MINGW32__
