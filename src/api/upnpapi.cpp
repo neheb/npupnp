@@ -421,7 +421,6 @@ static int WinsockInit(void)
 /* Initializes the global threadm pools used by the UPnP SDK. */
 static int UpnpInitThreadPools()
 {
-    int ret = UPNP_E_SUCCESS;
     ThreadPoolAttr attr;
 
     attr.maxThreads = MAX_THREADS;
@@ -431,17 +430,15 @@ static int UpnpInitThreadPools()
     attr.maxIdleTime = THREAD_IDLE_TIME;
     attr.maxJobsTotal = MAX_JOBS_TOTAL;
 
-    auto i = std::any_of(o_threadpools.begin(), o_threadpools.end(), [&](const std::pair<ThreadPool*, const char*> &entry)
-        { return entry.first->start(&attr) != UPNP_E_SUCCESS; });
+    auto i = std::any_of(o_threadpools.begin(), o_threadpools.end(), [&](const auto& entry) { return entry.first->start(&attr) != UPNP_E_SUCCESS; });
 
     if (i) {
-        ret = UPNP_E_INIT_FAILED;
         UpnpSdkInit = 0;
         UpnpFinish();
+        return UPNP_E_INIT_FAILED;
     }
-    return ret;
+    return UPNP_E_SUCCESS;
 }
-
 
 /*!
  * \brief Performs the initial steps in initializing the UPnP SDK.
@@ -823,9 +820,8 @@ EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const struct sockaddr_storag
     NetIF::IPAddr hostaddr;
     const NetIF::Interface *itf =
         NetIF::Interfaces::interfaceForAddress(claddr, g_netifs, hostaddr);
-    if (nullptr == itf) {
+    if (!itf)
         return {};
-    }
     int port = 0;
     std::string prefix;
     switch (hostaddr.family()) {
@@ -925,12 +921,10 @@ static int GetFreeHandle()
  */
 static int FreeHandle(int handleindex)
 {
-    if (handleindex >= 1 && handleindex < NUM_HANDLE) {
-        if (HandleTable[handleindex] != nullptr) {
-            delete HandleTable[handleindex];
-            HandleTable[handleindex] = nullptr;
-            return UPNP_E_SUCCESS;
-        }
+    if (handleindex >= 1 && handleindex < NUM_HANDLE && HandleTable[handleindex]) {
+        delete HandleTable[handleindex];
+        HandleTable[handleindex] = nullptr;
+        return UPNP_E_SUCCESS;
     }
     return UPNP_E_INVALID_HANDLE;
 }
@@ -1247,7 +1241,7 @@ static int readFile(const char *path, std::string& outstr, time_t *modtime)
     *modtime = st.st_mtime;
     {
         DirtySmartBuf buffer(st.st_size);
-        if (read(fd, buffer.buf(), st.st_size) != static_cast<ssize_t>(st.st_size)) {
+        if (read(fd, buffer.buf(), st.st_size) != st.st_size) {
             ret = UPNP_E_FILE_READ_ERROR;
             goto out;
         }
@@ -1488,7 +1482,7 @@ int UpnpSendAdvertisementLowPower(
     }
 
 #ifdef SSDP_PACKET_DISTRIBUTE
-    time_t thetime = ((Exp / 2) - (AUTO_ADVERTISEMENT_TIME));
+    time_t thetime = ((Exp / 2) - AUTO_ADVERTISEMENT_TIME);
 #else
     time_t thetime = Exp - AUTO_ADVERTISEMENT_TIME;
 #endif
@@ -1917,7 +1911,7 @@ int UpnpDownloadUrlItem(const std::string& url,
 /* Get callback function ptr from a handle. */
 [[maybe_unused]] static Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 {
-    return (static_cast<struct Handle_Info *>(HandleTable[Hnd]))->Callback;
+    return (HandleTable[Hnd])->Callback;
 }
 
 /* Assumes at most one client */
@@ -2019,7 +2013,7 @@ Upnp_Handle_Type GetHandleInfo(UpnpClient_Handle Hnd,
         //           "GetHandleInfo: HTable[%d] is NULL\n",
         //           Hnd);
     } else if (HandleTable[Hnd] != nullptr) {
-        *HndInfo = static_cast<struct Handle_Info *>(HandleTable[Hnd]);
+        *HndInfo = HandleTable[Hnd];
         ret = (*HndInfo)->HType;
     }
 
@@ -2030,7 +2024,7 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
 {
     struct Handle_Info * HndInfo;
     if (HandleTable[Hnd] != nullptr) {
-        HndInfo = static_cast<struct Handle_Info*>(HandleTable[Hnd]);
+        HndInfo = HandleTable[Hnd];
         UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                    "Handle_%d Type_%d: \n", Hnd, HndInfo->HType);
 #ifdef INCLUDE_DEVICE_APIS
@@ -2128,7 +2122,7 @@ int UpnpIsWebserverEnabled()
         return 0;
     }
 
-    return bWebServerState == static_cast<WebServerState>(WEB_SERVER_ENABLED);
+    return bWebServerState == WEB_SERVER_ENABLED;
 }
 
 int UpnpSetVirtualDirCallbacks(struct UpnpVirtualDirCallbacks *callbacks)

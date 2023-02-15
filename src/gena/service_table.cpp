@@ -255,7 +255,7 @@ service_info *FindServiceEventURLPath(
 service_info *FindServiceControlURLPath(
     service_table *table, const std::string& controlURLPath)
 {
-    if (nullptr == table) {
+    if (!table) {
         return nullptr;
     }
 
@@ -270,7 +270,7 @@ service_info *FindServiceControlURLPath(
             continue;
         }
         uri_type parsed_url;
-        if ((parse_uri(entry.controlURL, &parsed_url) != UPNP_E_SUCCESS)) {
+        if (parse_uri(entry.controlURL, &parsed_url) != UPNP_E_SUCCESS) {
             continue;
         }
         if (parsed_url.path == parsed_url_in.path &&

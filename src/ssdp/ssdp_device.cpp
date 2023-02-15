@@ -478,7 +478,6 @@ static int SendReply(
     std::string msgs[2];
     int num_msgs;
     char Mil_Usn[LINE_SIZE];
-    int i;
     int rc = 0;
     auto family = static_cast<int>(sscd.DestAddr->sa_family);
 
@@ -508,7 +507,7 @@ static int SendReply(
         }
     }
     /* check error */
-    for (i = 0; i < num_msgs; i++) {
+    for (int i = 0; i < num_msgs; i++) {
         if (msgs[i].empty()) {
             goto error_handler;
         }

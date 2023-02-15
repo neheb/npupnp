@@ -138,18 +138,13 @@ int UpnpResolveURL(const char *BaseURL, const char *RelURL, char *AbsURL)
 
 int UpnpResolveURL2(const char *BaseURL, const char *RelURL, char **AbsURL)
 {
-    int ret = UPNP_E_SUCCESS;
-
-    if (!RelURL) {
+    if (!RelURL)
         return UPNP_E_INVALID_PARAM;
-    }
     std::string temp = resolve_rel_url(const_cast<char *>(BaseURL), const_cast<char *>(RelURL));
-    if (!temp.empty()) {
-        *AbsURL = strdup(temp.c_str());
-    } else {
-        ret = UPNP_E_INVALID_URL;
-    }
-    return ret;
+    if (temp.empty())
+        return UPNP_E_INVALID_URL;
+    *AbsURL = strdup(temp.c_str());
+    return UPNP_E_SUCCESS;
 }
 
 #endif /* EXCLUDE_DOM == 0 */

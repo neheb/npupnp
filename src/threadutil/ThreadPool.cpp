@@ -534,7 +534,6 @@ void ThreadPool::Internal::addWorker(std::unique_lock<std::mutex>& lck)
 ThreadPool::Internal::Internal(ThreadPoolAttr *attr)
 {
     int retCode = 0;
-    int i = 0;
 
     std::unique_lock<std::mutex> lck(this->mutex);
     if (attr) {
@@ -551,7 +550,7 @@ ThreadPool::Internal::Internal(ThreadPoolAttr *attr)
     this->busyThreads = 0;
     this->persistentThreads = 0;
     this->pendingWorkerThreadStart = 0;
-    for (i = 0; i < this->attr.minThreads; ++i) {
+    for (int i = 0; i < this->attr.minThreads; ++i) {
         retCode = createWorker(lck);
         if (retCode) {
             break;
@@ -647,7 +646,6 @@ int ThreadPool::setAttr(ThreadPoolAttr *attr)
 {
     int retCode = 0;
     ThreadPoolAttr temp;
-    int i = 0;
 
     std::unique_lock<std::mutex> lck(m->mutex);
 
@@ -659,7 +657,7 @@ int ThreadPool::setAttr(ThreadPoolAttr *attr)
     m->attr = temp;
     /* add threads */
     if (m->totalThreads < m->attr.minThreads) {
-        for (i = m->totalThreads; i < m->attr.minThreads; i++) {
+        for (int i = m->totalThreads; i < m->attr.minThreads; i++) {
             retCode = m->createWorker(lck);
             if (retCode != 0) {
                 break;

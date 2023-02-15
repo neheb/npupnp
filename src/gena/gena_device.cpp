@@ -891,8 +891,7 @@ void gena_process_subscription_renewal_request(MHDTransaction *mhdt)
     }
 
     /* get subscription */
-    if(service == nullptr || !service->active ||
-       ((sub = GetSubscriptionSID( sid, service )) == nullptr)) {
+    if (!service || !service->active || !((sub = GetSubscriptionSID(sid, service)))) {
         http_SendStatusResponse(mhdt, HTTP_PRECONDITION_FAILED);
         HandleUnlock();
         return;

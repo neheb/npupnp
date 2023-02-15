@@ -84,7 +84,7 @@ int unique_service_name(const char *cmd, SsdpEntity *Evt)
 
     if (strstr(cmd, "uuid:") == cmd) {
         const char *theend = strstr(cmd, "::");
-        if (nullptr != theend) {
+        if (theend) {
             size_t n = theend - cmd;
             Evt->UDN = std::string(cmd, n);
         } else {
