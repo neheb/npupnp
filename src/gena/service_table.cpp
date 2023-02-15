@@ -1,41 +1,40 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
 
-
 /************************************************************************
- * Purpose: This file defines the functions for services. It defines 
- * functions for adding and removing services to and from the service table, 
- * adding and accessing subscription and other attributes pertaining to the 
- * service 
+ * Purpose: This file defines the functions for services. It defines
+ * functions for adding and removing services to and from the service table,
+ * adding and accessing subscription and other attributes pertaining to the
+ * service
  ************************************************************************/
 
 #include "config.h"
@@ -81,7 +80,7 @@ int copy_subscription(subscription *in, subscription *out)
  *                        subscriptions
  *
  *    Description :    Remove the subscription represented by the
- *        const Upnp_SID sid parameter from the service table and update 
+ *        const Upnp_SID sid parameter from the service table and update
  *        the service table.
  *
  *    Return : void ;
@@ -107,9 +106,7 @@ void RemoveSubscriptionSID(const Upnp_SID& sid, service_info *service)
 subscription *GetSubscriptionSID(const Upnp_SID& sid, service_info *service)
 {
     auto& sublist(service->subscriptionList);
-    auto found = find_if(sublist.begin(), sublist.end(),
-                         [sid](const subscription& s)->bool{
-                             return sid == s.sid;});
+    auto found = std::find(sublist.begin(), sublist.end(), sid);
     if (found == sublist.end()) {
         return nullptr;
     }
@@ -168,13 +165,13 @@ subscription::~subscription()
  *
  *    Parameters :
  *        service_table *table ;    service table
- *        const std::string& serviceId ;string representing the service id 
- *                                to be found among those in the table    
- *        const std::string& UDN ;        string representing the UDN 
- *                                to be found among those in the table    
+ *        const std::string& serviceId ;string representing the service id
+ *                                to be found among those in the table
+ *        const std::string& UDN ;        string representing the UDN
+ *                                to be found among those in the table
  *
- *    Description :    Traverses through the service table and returns a 
- *        pointer to the service node that matches a known service  id 
+ *    Description :    Traverses through the service table and returns a
+ *        pointer to the service node that matches a known service  id
  *        and a known UDN
  *
  *    Return : service_info * - pointer to the matching service_info node;
@@ -196,13 +193,13 @@ service_info *FindServiceId(
  *
  *    Parameters :
  *        service_table *table ;    service table
- *        char * eventURLPath ;    event URL path used to find a service 
- *                                from the table    
+ *        char * eventURLPath ;    event URL path used to find a service
+ *                                from the table
  *
  *    Description :    Traverses the service table and finds the node whose
- *        event URL Path matches a know value 
+ *        event URL Path matches a know value
  *
- *    Return : service_info * - pointer to the service list node from the 
+ *    Return : service_info * - pointer to the service list node from the
  *        service table whose event URL matches a known event URL;
  *
  *    Note :
@@ -243,13 +240,13 @@ service_info *FindServiceEventURLPath(
  *
  *    Parameters :
  *        service_table * table ;    service table
- *        char * controlURLPath ;    control URL path used to find a service 
- *                                from the table    
+ *        char * controlURLPath ;    control URL path used to find a service
+ *                                from the table
  *
  *    Description :    Traverses the service table and finds the node whose
- *        control URL Path matches a know value 
+ *        control URL Path matches a know value
  *
- *    Return : service_info * - pointer to the service list node from the 
+ *    Return : service_info * - pointer to the service list node from the
  *        service table whose control URL Path matches a known value;
  *
  *    Note :
@@ -261,7 +258,7 @@ service_info *FindServiceControlURLPath(
     if (nullptr == table) {
         return nullptr;
     }
-    
+
     uri_type parsed_url_in;
     if (parse_uri(controlURLPath, &parsed_url_in)
         != UPNP_E_SUCCESS) {
@@ -294,7 +291,7 @@ service_info *FindServiceControlURLPath(
  *        Upnp_LogLevel level ; Debug level specified to the print function
  *        Dbg_Module module ;    Debug module specified to the print function
  *
- *    Description :    For debugging purposes prints information from the 
+ *    Description :    For debugging purposes prints information from the
  *        service passed into the function.
  *
  *    Return : void ;
@@ -336,7 +333,7 @@ void printService(
  *        Upnp_LogLevel level ;    Debug level specified to the print function
  *        Dbg_Module module ;    Debug module specified to the print function
  *
- *    Description :    For debugging purposes prints information of each 
+ *    Description :    For debugging purposes prints information of each
  *        service from the service table passed into the function.
  *
  *    Return : void ;
@@ -360,7 +357,7 @@ void printServiceList(
  *        Dbg_Module module ;    Debug module specified to the print function
  *
  *    Description :    For debugging purposes prints the URL base of the table
- *        and information of each service from the service table passed into 
+ *        and information of each service from the service table passed into
  *        the function.
  *
  *    Return : void ;
@@ -382,7 +379,7 @@ void printServiceTable(
  *    Function :    freeServiceTable
  *
  *    Parameters :
- *        service_table * table ;    Service table whose memory needs to be 
+ *        service_table * table ;    Service table whose memory needs to be
  *                                freed
  *
  *    Description : Free's dynamic memory in table.

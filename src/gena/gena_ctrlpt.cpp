@@ -467,8 +467,7 @@ int genaUnSubscribe(UpnpClient_Handle client_handle, const std::string& in_sid)
         HandleUnlock();
         return GENA_E_BAD_HANDLE;
     }
-    auto sub = std::find_if(handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(),
-                            [in_sid](const ClientSubscription& e){return e.SID == in_sid;});
+    auto sub = std::find(handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(), in_sid);
     if (handle_info->ClientSubList.end() == sub) {
         HandleUnlock();
         return GENA_E_BAD_SID;
@@ -566,8 +565,7 @@ int genaRenewSubscription(
         return GENA_E_BAD_HANDLE;
     }
 
-    auto sub = std::find_if(handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(),
-                            [in_sid](const ClientSubscription& e){return e.SID == in_sid;});
+    auto sub = std::find(handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(), in_sid);
     if (handle_info->ClientSubList.end() == sub) {
         HandleUnlock();
         return GENA_E_BAD_SID;
@@ -602,8 +600,7 @@ int genaRenewSubscription(
     }
 
     /* get subscription */
-    sub = std::find_if(handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(),
-                       [in_sid](const ClientSubscription& e){return e.SID == in_sid;});
+    sub = std::find(handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(), in_sid);
     if (handle_info->ClientSubList.end() == sub) {
         clientCancelRenew(&sub_copy);
         HandleUnlock();
@@ -731,9 +728,8 @@ void gena_process_notification_event(MHDTransaction *mhdt)
     }
 
     /* get subscription based on SID */
-    auto subscription = std::find_if(
-        handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(),
-        [sid](const ClientSubscription& e){return e.SID == sid;});
+    auto subscription = std::find(
+        handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(), sid);
     if (handle_info->ClientSubList.end() == subscription) {
         if (eventKey == 0) {
             /* wait until we've finished processing a subscription  */
@@ -756,9 +752,8 @@ void gena_process_notification_event(MHDTransaction *mhdt)
                 return;
             }
 
-            subscription = std::find_if(
-                handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(),
-                [sid](const ClientSubscription& e){return e.SID == sid;});
+            subscription = std::find(
+                handle_info->ClientSubList.begin(), handle_info->ClientSubList.end(), sid);
             if (handle_info->ClientSubList.end() == subscription) {
                 http_SendStatusResponse(mhdt, HTTP_PRECONDITION_FAILED);
                 SubscribeUnlock();

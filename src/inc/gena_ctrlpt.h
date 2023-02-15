@@ -49,6 +49,11 @@ struct ClientSubscription {
         }
         return *this;
     }
+
+    bool operator==(const std::string& s) const
+    {
+        return SID == s;
+    }
 };
 
 extern std::mutex GlobalClientSubscribeMutex;

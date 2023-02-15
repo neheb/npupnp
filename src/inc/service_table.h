@@ -68,6 +68,11 @@ struct subscription {
     ~subscription();
     subscription& operator=(const subscription&) = delete;
     subscription(const subscription&) = delete;
+
+    bool operator==(const Upnp_SID& s) const
+    {
+        return sid == s;
+    }
 };
 
 extern void freeSubscriptionQueuedEvents(subscription *sub);

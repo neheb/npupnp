@@ -31,10 +31,8 @@ protected:
         // Arghh: upmpdcli wrongly used devicelist instead of
         // deviceList. Support both as it is unlikely that anybody
         // would use both for different purposes
-        bool ismain = !std::any_of(
-            m_path.begin(), m_path.end(),
-            [](const StackEl& el) {
-                return !stringlowercmp("devicelist", el.name);});
+        bool ismain = std::all_of(m_path.begin(), m_path.end(),
+            [](const auto& el) { return stringlowercmp("devicelist", el.name); });
 
         UPnPDeviceDesc* dev = ismain ? &m_device : &m_tdevice;
 
