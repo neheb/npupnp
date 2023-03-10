@@ -134,7 +134,7 @@ Upnp_Handle_Type GetHandleInfo(
     /*! handle pointer (key for the client handle structure). */
     int Hnd,
     /*! handle structure passed by this function. */
-    struct Handle_Info **HndInfo);
+    Handle_Info **HndInfo);
 
 
 #define HandleLock() HandleWriteLock()
@@ -172,7 +172,7 @@ Upnp_Handle_Type GetClientHandleInfo(
     /*! [in] client handle pointer (key for the client handle structure). */
     int *client_handle_out,
     /*! [out] Client handle structure passed by this function. */
-    struct Handle_Info **HndInfo);
+    Handle_Info **HndInfo);
 
 /*!
  * \brief Retrieves the device handle and information of the first
@@ -188,7 +188,7 @@ Upnp_Handle_Type GetDeviceHandleInfo(
     /*! [out] Device handle pointer. */
     int *device_handle_out,
     /*! [out] Device handle structure passed by this function. */
-    struct Handle_Info **HndInfo);
+    Handle_Info **HndInfo);
 
 /*!
  * \brief Retrieves the device handle and information of the first device of
@@ -203,7 +203,7 @@ Upnp_Handle_Type GetDeviceHandleInfoForPath(
     /*! [out] Device handle pointer. */
     int *devhdl,
     /*! [out] Device handle structure passed by this function. */
-    struct Handle_Info **HndInfo,
+    Handle_Info **HndInfo,
     /*! [out] Service info for found path. */
     service_info **serv_info
     );
@@ -247,7 +247,7 @@ extern ThreadPool gRecvThreadPool;
 extern ThreadPool gSendThreadPool;
 extern ThreadPool gMiniServerThreadPool;
 
-extern struct VirtualDirCallbacks virtualDirCallback;
+extern VirtualDirCallbacks virtualDirCallback;
 
 void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
 

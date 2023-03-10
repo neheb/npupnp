@@ -97,7 +97,7 @@ static void clientCancelRenew(ClientSubscription *sub)
 }
 
 struct upnp_timeout_data_subscribe : public upnp_timeout_data {
-    struct Upnp_Event_Subscribe sub;
+    Upnp_Event_Subscribe sub;
 };
 
 class AutoRenewSubscriptionJobWorker : public JobWorker {
@@ -145,7 +145,7 @@ void AutoRenewSubscriptionJobWorker::work()
 
     if (send_callback) {
         HandleReadLock();
-        struct Handle_Info *handle_info;
+        Handle_Info *handle_info;
         if (GetHandleInfo(event->handle, &handle_info) != HND_CLIENT) {
             HandleUnlock();
             return;
@@ -236,7 +236,7 @@ static int gena_unsubscribe(
     curl_easy_setopt(easy, CURLOPT_URL, surl.c_str());
     curl_easy_setopt(easy, CURLOPT_TIMEOUT, HTTP_DEFAULT_TIMEOUT);
 
-    struct curl_slist *list = nullptr;
+    curl_slist *list = nullptr;
     list = curl_slist_append(list, (std::string("SID: ") + sid).c_str());
     list = curl_slist_append(list, (std::string("USER-AGENT: ") + get_sdk_client_info()).c_str());
     curl_easy_setopt(easy, CURLOPT_HTTPHEADER, list);
@@ -293,7 +293,7 @@ struct CurlGuard {
     CurlGuard(const CurlGuard&) = delete;
     CurlGuard& operator=(const CurlGuard&) = delete;
     CURL *htalk{nullptr};
-    struct curl_slist *hlist{nullptr};
+    curl_slist *hlist{nullptr};
 };
 
 /*!
@@ -336,7 +336,7 @@ static int gena_subscribe(
         return return_code;
     }
     std::string urlforcurl = uri_asurlstr(dest_url);
-    NetIF::IPAddr destaddr(reinterpret_cast<struct sockaddr*>(&dest_url.hostport.IPaddress));
+    NetIF::IPAddr destaddr(reinterpret_cast<sockaddr*>(&dest_url.hostport.IPaddress));
 
     // Determine a suitable address for the callback. We choose one on the interface for the
     // destination address. Another possible approach would be to actually connect to the URL and
@@ -425,7 +425,7 @@ static int gena_subscribe(
 int genaUnregisterClient(UpnpClient_Handle client_handle)
 {
     int return_code = UPNP_E_SUCCESS;
-    struct Handle_Info *handle_info = nullptr;
+    Handle_Info *handle_info = nullptr;
 
     while (true) {
         HandleLock();
@@ -459,7 +459,7 @@ int genaUnSubscribe(UpnpClient_Handle client_handle, const std::string& in_sid)
 {
     /* validate handle and sid */
     HandleLock();
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
     if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
         HandleUnlock();
         return GENA_E_BAD_HANDLE;
@@ -499,7 +499,7 @@ int genaSubscribe(
     ClientSubscription newSubscription;
     std::string SID;
     std::string EventURL;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
 
     out_sid->clear();
 
@@ -555,7 +555,7 @@ int genaRenewSubscription(
     HandleLock();
 
     /* validate handle and sid */
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
     if (GetHandleInfo(client_handle, &handle_info) != HND_CLIENT) {
         HandleUnlock();
         return GENA_E_BAD_HANDLE;
@@ -716,7 +716,7 @@ void gena_process_notification_event(MHDTransaction *mhdt)
     HandleLock();
 
     /* get client info */
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
     UpnpClient_Handle client_handle;
     if (GetClientHandleInfo(&client_handle, &handle_info) != HND_CLIENT) {
         http_SendStatusResponse(mhdt, HTTP_PRECONDITION_FAILED);
@@ -776,7 +776,7 @@ void gena_process_notification_event(MHDTransaction *mhdt)
     http_SendStatusResponse(mhdt, HTTP_OK);
 
     /* fill event struct */
-    struct Upnp_Event event_struct;
+    Upnp_Event event_struct;
     event_struct.Sid = subscription->SID;
     event_struct.EventKey = eventKey;
     event_struct.ChangedVariables = propset;

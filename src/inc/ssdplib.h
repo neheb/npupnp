@@ -1,34 +1,34 @@
 #ifndef SSDPLIB_H
-#define SSDPLIB_H 
+#define SSDPLIB_H
 
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (C) 2011-2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (C) 2011-2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
@@ -86,7 +86,7 @@ struct SsdpSearchArg {
     int timeoutEventId{-1};
     // The request type and search target are matched against incoming
     // search responses to determine if we need to call back.
-    enum SsdpSearchType requestType;
+    SsdpSearchType requestType;
     std::string searchTarget;
     // Client cookie for the callback
     void *cookie;
@@ -95,7 +95,7 @@ struct SsdpSearchArg {
 /* Storage for the data extracted from a received M-SEARCH Search
    Target (ST) or NOTIFY Notification Type (NT) header. */
 struct SsdpEntity {
-    enum SsdpSearchType RequestType{SSDP_SERROR};
+    SsdpSearchType RequestType{SSDP_SERROR};
     std::string UDN;
     std::string DeviceType;
     std::string ServiceType;
@@ -126,12 +126,12 @@ enum SSDPDevMessageType {MSGTYPE_SHUTDOWN, MSGTYPE_ADVERTISEMENT, MSGTYPE_REPLY}
  */
 int AdvertiseAndReply(
     /* [in] Device handle. */
-    UpnpDevice_Handle Hnd, 
+    UpnpDevice_Handle Hnd,
     /* [in] Message type: notify alive/shutdown, or search reply */
     SSDPDevMessageType tp,
     /* [in] Advertisement max-age or search response random delay base. */
     int Exp,
-    struct sockaddr *repDestAddr,
+    sockaddr *repDestAddr,
     /* [in] Additional descriptive data for a search request */
     const SsdpEntity& sdata
 );
@@ -156,12 +156,12 @@ int unique_service_name(
  * \return enum SsdpSearchType. Returns appropriate search type,
  * else returns SSDP_ERROR
  */
-enum SsdpSearchType ssdp_request_type1(
+SsdpSearchType ssdp_request_type1(
     /* [in] command came in the ssdp request. */
     const char *cmd);
 
 /*!
- * Interpret the NT or ST notification/Search type field in the parsed SSDP 
+ * Interpret the NT or ST notification/Search type field in the parsed SSDP
  * packet, and extract UDN/DeviceType/ServiceType if present.
  *
  * \return 0 on success; -1 on error.
@@ -205,7 +205,7 @@ void ssdp_handle_ctrlpt_msg(
     /* [in] SSDP message from the device. */
     SSDPPacketParser& parser,
     /* [in] Address of the device. */
-    struct sockaddr_storage *dest_addr,
+    sockaddr_storage *dest_addr,
     /* [in] Cookie stored by the control point application. This cookie will
      * be returned to the control point in the callback.
      * Only in search reply. */
@@ -250,12 +250,12 @@ void ssdp_handle_device_request(
     /* [in] . */
     SSDPPacketParser& parser,
     /* [in] . */
-    struct sockaddr_storage *dest_addr);
+    sockaddr_storage *dest_addr);
 
 #else /* INCLUDE_DEVICE_APIS */
 
 static UPNP_INLINE void ssdp_handle_device_request(
-    SSDPPacketParser&, struct sockaddr_storage *) {}
+    SSDPPacketParser&, sockaddr_storage *) {}
 
 #endif /* INCLUDE_DEVICE_APIS */
 

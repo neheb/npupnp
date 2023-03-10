@@ -910,7 +910,7 @@ void unsetenv(const char *name)
 }
 #endif
 
-time_t portable_timegm(struct tm *tm)
+time_t portable_timegm(tm *tm)
 {
     time_t ret;
     char *tz;
@@ -943,9 +943,9 @@ static void cerrdip(const string& s, DateInterval *dip)
 // back
 static bool addperiod(DateInterval *dp, DateInterval *pp)
 {
-    // Create a struct tm with possibly non normalized fields and let
+    // Create a tm with possibly non normalized fields and let
     // timegm sort it out
-    struct tm tm = {};
+    tm tm = {};
     tm.tm_year = dp->y1 - 1900 + pp->y1;
     tm.tm_mon = dp->m1 + pp->m1 - 1;
     tm.tm_mday = dp->d1 + pp->d1;
@@ -1048,7 +1048,7 @@ secondelt:
     // Empty part means today IF other part is period, else means
     // forever (stays at 0)
     time_t now = time(nullptr);
-    struct tm *tmnow = gmtime(&now);
+    tm *tmnow = gmtime(&now);
     if ((!hasp1 && !hasd1) && hasp2) {
         d1.y1 = 1900 + tmnow->tm_year;
         d1.m1 = tmnow->tm_mon + 1;
@@ -1183,7 +1183,7 @@ void catstrerror(string *reason, const char *what, int _errno)
     // changing the cxxflags globally, so forget it. Recent gnu lib versions
     // normally default to the posix version. (not !)
     // The feature defines tests are too complicated and seem unreliable.
-    // In short it's a mess, but thanks to c++ function overloading and smart 
+    // In short it's a mess, but thanks to c++ function overloading and smart
     // people, we have a solution:
     // https://www.zverovich.net/2015/03/13/reliable-detection-of-strerror-variants.html
     char errbuf[200];
@@ -1369,7 +1369,7 @@ static inline int h2d(int c) {
         return 10 + c - 'A';
     else if ('a' <= c && c <= 'f')
         return 10 + c - 'a';
-    else 
+    else
         return -1;
 }
 

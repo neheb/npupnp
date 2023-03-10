@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -65,8 +65,8 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
 {
     char workbuf[256];
     char *c;
-    auto sai4 = reinterpret_cast<struct sockaddr_in *>(&out->IPaddress);
-    auto sai6 = reinterpret_cast<struct sockaddr_in6 *>(&out->IPaddress);
+    auto sai4 = reinterpret_cast<sockaddr_in *>(&out->IPaddress);
+    auto sai6 = reinterpret_cast<sockaddr_in6 *>(&out->IPaddress);
     char *srvname = nullptr;
     char *srvport = nullptr;
     char *last_dot = nullptr;
@@ -119,7 +119,7 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
             /* Must be a host name. */
             out->hostisname = true;
             if (!noresolve) {
-                struct addrinfo hints = {}, *res, *res0;
+                addrinfo hints = {}, *res, *res0;
 
                 hints.ai_family = AF_UNSPEC;
                 hints.ai_socktype = SOCK_STREAM;
@@ -211,14 +211,14 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
 }
 
 /*!
- * \brief parses a uri scheme starting at in[0] as defined in 
+ * \brief parses a uri scheme starting at in[0] as defined in
  * http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs).
  *
  * (e.g. "http:" -> scheme= "http").
  *
  * \note String MUST include ':' within the max charcters.
  *
- * \return 
+ * \return
  */
 static size_t parse_scheme(const std::string& in, std::string& out)
 {
@@ -457,9 +457,9 @@ int parse_uri(const std::string& in, uri_type *out)
 }
 
 std::string maybeScopeUrlAddr(
-    const char *inurl, uri_type& prsduri, const struct sockaddr_storage *remoteaddr)
+    const char *inurl, uri_type& prsduri, const sockaddr_storage *remoteaddr)
 {
-    NetIF::IPAddr urlip(reinterpret_cast<const struct sockaddr*>(&prsduri.hostport.IPaddress));
+    NetIF::IPAddr urlip(reinterpret_cast<const sockaddr*>(&prsduri.hostport.IPaddress));
 
     if (urlip.family() != NetIF::IPAddr::Family::IPV6 ||
         urlip.scopetype() != NetIF::IPAddr::Scope::LINK) {
@@ -468,18 +468,18 @@ std::string maybeScopeUrlAddr(
     }
 
     // Set the scope from the one in the remote address.
-    NetIF::IPAddr remip(reinterpret_cast<const struct sockaddr*>(remoteaddr));
+    NetIF::IPAddr remip(reinterpret_cast<const sockaddr*>(remoteaddr));
     urlip.setScopeIdx(remip);
     std::string scopedaddr = urlip.straddr(true, true);
 
-    auto sa6 = reinterpret_cast<struct sockaddr_in6*>(&prsduri.hostport.IPaddress);
+    auto sa6 = reinterpret_cast<sockaddr_in6*>(&prsduri.hostport.IPaddress);
     char portbuf[20];
     snprintf(portbuf, sizeof(portbuf), "%hu", ntohs(sa6->sin6_port));
     prsduri.hostport.text = std::string("[") + scopedaddr + "]:" + portbuf;
     return uri_asurlstr(prsduri);
 }
 
-std::string maybeScopeUrlAddr(const char *inurl, const struct sockaddr_storage *remoteaddr)
+std::string maybeScopeUrlAddr(const char *inurl, const sockaddr_storage *remoteaddr)
 {
     uri_type prsduri;
     if (parse_uri(inurl, &prsduri) != UPNP_E_SUCCESS || prsduri.hostport.text.empty()) {
