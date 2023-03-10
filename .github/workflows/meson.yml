@@ -27,8 +27,9 @@ jobs:
       - name: Compile and Test
         env:
           CXX: g++-${{matrix.cxx}}
+          CXXFLAGS: '-Wno-abi-tag -Wno-padded -Wno-unused-macros -Wno-effc++ -Wno-conversion -Wno-switch-enum -Wno-switch-default -Wno-cast-align'
         run: |
-          meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
+          meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=everything
           meson compile -C "${{github.workspace}}/build" --verbose
           meson test -C "${{github.workspace}}/build" --verbose
 

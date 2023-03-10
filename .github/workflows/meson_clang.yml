@@ -28,7 +28,7 @@ jobs:
       - name: Compile and Test
         env:
           CXX: clang++-${{matrix.cxx}}
-          CXXFLAGS: -stdlib=libc++
+          CXXFLAGS: '-stdlib=libc++ -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-c++98-compat-local-type-template-args -Wno-global-constructors -Wno-exit-time-destructors -Wno-covered-switch-default -Wno-reserved-id-macro -Wno-padded -Wno-switch-enum -Wno-documentation-unknown-command -Wno-conversion -Wno-documentation -Wno-disabled-macro-expansion -Wno-weak-vtables -Wno-unused-macros -Wno-shadow -Wno-header-hygiene'
           CXX_LD: lld-${{matrix.cxx}}
         run: |
           meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=everything -Dcpp_std=c++20
