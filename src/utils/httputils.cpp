@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -108,7 +108,7 @@ static const std::map<std::string, int> Http_Header_Names {
     {"usn", HDR_USN},
 };
 
-void MHDTransaction::copyClientAddress(struct sockaddr_storage *dest) const
+void MHDTransaction::copyClientAddress(sockaddr_storage *dest) const
 {
     if (nullptr == dest)
         return;
@@ -117,10 +117,10 @@ void MHDTransaction::copyClientAddress(struct sockaddr_storage *dest) const
         return;
     }
     if (client_address->ss_family == AF_INET) {
-        memcpy(dest, client_address, sizeof(struct sockaddr_in));
+        memcpy(dest, client_address, sizeof(sockaddr_in));
     } else {
-        memcpy(dest, client_address, sizeof(struct sockaddr_in6));
-    }        
+        memcpy(dest, client_address, sizeof(sockaddr_in6));
+    }
 }
 
 bool MHDTransaction::copyHeader(const std::string& name,
@@ -186,7 +186,7 @@ int http_FixStrUrl(const std::string& surl, uri_type *fixed_url)
  *    OUT char* content_type;    Type of content
  *
  * Description:
- *    Download the document message and extract the document 
+ *    Download the document message and extract the document
  *    from the message.
  *
  * Return: int
@@ -216,7 +216,7 @@ int http_Download(const char *_surl, int timeout_secs,
     curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, write_callback_str_curl);
     curl_easy_setopt(easy, CURLOPT_WRITEDATA, &data);
 
-    struct curl_slist *list = nullptr;
+    curl_slist *list = nullptr;
     list = curl_slist_append(list, (std::string("USER-AGENT: ") + get_sdk_client_info()).c_str());
     list = curl_slist_append(list, "Connection: close");
     curl_easy_setopt(easy, CURLOPT_HTTPHEADER, list);
@@ -238,7 +238,7 @@ int http_Download(const char *_surl, int timeout_secs,
 
     curl_easy_cleanup(easy);
     curl_slist_free_all(list);
-    
+
     /* optional content-type */
     if (content_type) {
         auto it = http_headers.find("content-type");
@@ -279,7 +279,7 @@ int http_Download(const char *_surl, int timeout_secs,
  * Function: http_SendStatusResponse
  *
  * Parameters:
- *    IN int http_status_code;    error code returned while making 
+ *    IN int http_status_code;    error code returned while making
  *                    or sending the response message
  *    IN int request_major_version;    request major version
  *    IN int request_minor_version;    request minor version
@@ -297,7 +297,7 @@ int http_Download(const char *_surl, int timeout_secs,
 int http_SendStatusResponse(MHDTransaction *mhdt, int status_code)
 {
     std::ostringstream body;
-    body <<    "<html><body><h1>" << status_code << " " << 
+    body <<    "<html><body><h1>" << status_code << " " <<
         http_get_code_text(status_code) << "</h1></body></html>";
     mhdt->response = MHD_create_response_from_buffer(
         body.str().size(), const_cast<char*>(body.str().c_str()), MHD_RESPMEM_MUST_COPY);
@@ -349,7 +349,7 @@ bool timeout_header_value(std::map<std::string, std::string>& headers,
 }
 
 #ifdef _WIN32
-struct tm *http_gmtime_r(const time_t *clock, struct tm *result)
+tm *http_gmtime_r(const time_t *clock, tm *result)
 {
     if (clock == NULL || *clock < 0 || result == NULL)
         return NULL;
@@ -384,7 +384,7 @@ static const std::string& get_sdk_common_info()
                 versioninfo.dwBuildNumber << " " << versioninfo.dwPlatformId
                  << "/" << versioninfo.szCSDVersion;
 #else
-        struct utsname sys_info;
+        utsname sys_info;
 
         if (uname(&sys_info) != -1)
             ostr << sys_info.sysname << "/" << sys_info.release;
@@ -410,10 +410,10 @@ const std::string& get_sdk_client_info(const std::string& newvalue)
     if (sdk_client_info.empty() || !newvalue.empty()) {
         // If this was never set, or the client wants to set its name, compute
         sdk_client_info = get_sdk_common_info() +
-            (!newvalue.empty() ? newvalue : 
+            (!newvalue.empty() ? newvalue :
              std::string("Portable SDK for UPnP devices/" NPUPNP_VERSION_STRING));
     }
-    
+
     return sdk_client_info;
 }
 
@@ -424,8 +424,8 @@ std::string make_date_string(time_t thetime)
         "Jul\0Aug\0Sep\0Oct\0Nov\0Dec";
 
     time_t curr_time = thetime ? thetime : time(nullptr);
-    struct tm date_storage;
-    struct tm *date = http_gmtime_r(&curr_time, &date_storage);
+    tm date_storage;
+    tm *date = http_gmtime_r(&curr_time, &date_storage);
     if (date == nullptr)
         return {};
     char tempbuf[200];

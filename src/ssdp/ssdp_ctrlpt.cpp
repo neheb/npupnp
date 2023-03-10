@@ -56,7 +56,7 @@ nnn * Redistribution and use in source and binary forms, with or without
 
 /*! Structure to contain Discovery response. */
 struct ResultData {
-    struct Upnp_Discovery param;
+    Upnp_Discovery param;
     void *cookie;
     Upnp_FunPtr ctrlpt_callback;
 };
@@ -82,13 +82,13 @@ public:
 };
 
 void ssdp_handle_ctrlpt_msg(SSDPPacketParser& parser,
-                            struct sockaddr_storage *dest_addr,
+                            sockaddr_storage *dest_addr,
                             void *)
 {
     int handle;
-    struct Handle_Info *ctrlpt_info = nullptr;
+    Handle_Info *ctrlpt_info = nullptr;
     int is_byebye;
-    struct Upnp_Discovery param;
+    Upnp_Discovery param;
     SsdpEntity event;
     int nt_found;
     int usn_found;
@@ -128,7 +128,7 @@ void ssdp_handle_ctrlpt_msg(SSDPPacketParser& parser,
         upnp_strlcpy(param.Date, parser.date, LINE_SIZE);
     }
     /* remote addr */
-    memcpy(&param.DestAddr, dest_addr, sizeof(struct sockaddr_storage));
+    memcpy(&param.DestAddr, dest_addr, sizeof(sockaddr_storage));
     /* EXT is upnp 1.0 compat. It has no value in 1.1 */
     param.Ext[0] = '\0';
     /* LOCATION. If the URL contains an IPV6 link-local address, we
@@ -338,7 +338,7 @@ void SearchExpiredJobWorker::work()
     HandleLock();
 
     int handle;
-    struct Handle_Info *ctrlpt_info;
+    Handle_Info *ctrlpt_info;
     if (GetClientHandleInfo(&handle, &ctrlpt_info) != HND_CLIENT) {
         HandleUnlock();
         return;
@@ -366,7 +366,7 @@ void SearchExpiredJobWorker::work()
 
 int SearchByTarget(int Mx, char *St, void *Cookie)
 {
-    enum SsdpSearchType requestType = ssdp_request_type1(St);
+    SsdpSearchType requestType = ssdp_request_type1(St);
     if (requestType == SSDP_SERROR)
         return UPNP_E_INVALID_PARAM;
 
@@ -391,7 +391,7 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
     /* add search criteria to list */
     HandleLock();
     int handle;
-    struct Handle_Info *ctrlpt_info;
+    Handle_Info *ctrlpt_info;
     if (GetClientHandleInfo(&handle, &ctrlpt_info) != HND_CLIENT) {
         HandleUnlock();
         return UPNP_E_INTERNAL_ERROR;
@@ -451,9 +451,9 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
 
 #ifdef UPNP_ENABLE_IPV6
     if (gSsdpReqSocket6 != INVALID_SOCKET && FD_ISSET(gSsdpReqSocket6, &wrSet)) {
-        struct sockaddr_storage ssv6 = {};
+        sockaddr_storage ssv6 = {};
 
-        auto destAddr6 = reinterpret_cast<struct sockaddr_in6 *>(&ssv6);
+        auto destAddr6 = reinterpret_cast<sockaddr_in6 *>(&ssv6);
         destAddr6->sin6_family = static_cast<sa_family_t>(AF_INET6);
         inet_pton(AF_INET6, SSDP_IPV6_LINKLOCAL, &destAddr6->sin6_addr);
         destAddr6->sin6_port = htons(SSDP_PORT);
@@ -463,17 +463,17 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
             UpnpPrintf(UPNP_DEBUG, SSDP, __FILE__, __LINE__,
                        ">>> SSDP SEND M-SEARCH >>>\n%s\n", ReqBufv6.c_str());
             sendto(gSsdpReqSocket6, ReqBufv6.c_str(), ReqBufv6.size(), 0,
-                   reinterpret_cast<struct sockaddr *>(destAddr6),
-                   sizeof(struct sockaddr_in6));
+                   reinterpret_cast<sockaddr *>(destAddr6),
+                   sizeof(sockaddr_in6));
             std::this_thread::sleep_for(std::chrono::milliseconds(SSDP_PAUSE));
         }
     }
 #endif /* UPNP_ENABLE_IPV6 */
 
     if (gSsdpReqSocket4 != INVALID_SOCKET && FD_ISSET(gSsdpReqSocket4, &wrSet)) {
-        struct sockaddr_storage ssv4 = {};
+        sockaddr_storage ssv4 = {};
 
-        auto destAddr4 = reinterpret_cast<struct sockaddr_in *>(&ssv4);
+        auto destAddr4 = reinterpret_cast<sockaddr_in *>(&ssv4);
         destAddr4->sin_family = static_cast<sa_family_t>(AF_INET);
         inet_pton(AF_INET, SSDP_IP, &destAddr4->sin_addr);
         destAddr4->sin_port = htons(SSDP_PORT);
@@ -483,8 +483,8 @@ int SearchByTarget(int Mx, char *St, void *Cookie)
             UpnpPrintf(UPNP_DEBUG, SSDP, __FILE__, __LINE__,
                        ">>> SSDP SEND M-SEARCH >>>\n%s\n", ReqBufv4.c_str());
             sendto(gSsdpReqSocket4, ReqBufv4.c_str(), ReqBufv4.size(), 0,
-                   reinterpret_cast<struct sockaddr *>(destAddr4),
-                   sizeof(struct sockaddr_in));
+                   reinterpret_cast<sockaddr *>(destAddr4),
+                   sizeof(sockaddr_in));
             NumCopy++;
             std::this_thread::sleep_for(std::chrono::milliseconds(SSDP_PAUSE));
         }

@@ -223,7 +223,7 @@ void catstrerror(std::string *reason, const char *what, int _errno);
 
 /** Portable timegm. MS C has _mkgmtime, but there is a bug in Gminw which
  * makes it inaccessible */
-time_t portable_timegm(struct tm *tm);
+time_t portable_timegm(tm *tm);
 
 inline void leftzeropad(std::string &s, unsigned len) {
     if (s.length() && s.length() < len) {

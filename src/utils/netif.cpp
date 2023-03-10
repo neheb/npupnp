@@ -2,28 +2,28 @@
  *
  * Copyright (c) 2020 Jean-Francois Dockes
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -98,9 +98,9 @@ static FILE *logfp;
 class IPAddr::Internal {
 public:
     bool ok{false};
-    struct sockaddr_storage address{};
-    struct sockaddr *saddr() {
-        return reinterpret_cast<struct sockaddr*>(&address);
+    sockaddr_storage address{};
+    sockaddr *saddr() {
+        return reinterpret_cast<sockaddr*>(&address);
     }
 };
 
@@ -138,13 +138,13 @@ IPAddr::IPAddr(const char *caddr)
 {
     if (nullptr != std::strchr(caddr, ':')) {
         if (inet_pton(AF_INET6, caddr,
-                      &reinterpret_cast<struct sockaddr_in6*>(m->saddr())->sin6_addr) == 1) {
+                      &reinterpret_cast<sockaddr_in6*>(m->saddr())->sin6_addr) == 1) {
             m->saddr()->sa_family = AF_INET6;
             m->ok = true;
         }
     } else {
         if (inet_pton(AF_INET, caddr,
-                      &reinterpret_cast<struct sockaddr_in*>(m->saddr())->sin_addr) == 1) {
+                      &reinterpret_cast<sockaddr_in*>(m->saddr())->sin_addr) == 1) {
             m->saddr()->sa_family = AF_INET;
             m->ok = true;
         }
@@ -153,21 +153,21 @@ IPAddr::IPAddr(const char *caddr)
 
 static const uint8_t ipv4mappedprefix[12] = {0,0,0,0,0,0,0,0,0,0,0xff,0xff};
 
-IPAddr::IPAddr(const struct sockaddr *sa, bool unmapv4)
+IPAddr::IPAddr(const sockaddr *sa, bool unmapv4)
     : IPAddr()
 {
     switch (sa->sa_family) {
     case AF_INET:
-        memcpy(m->saddr(), sa, sizeof(struct sockaddr_in));
+        memcpy(m->saddr(), sa, sizeof(sockaddr_in));
         m->ok = true;
         break;
     case AF_INET6:
     {
         if (unmapv4) {
             const uint8_t *bytes =
-                reinterpret_cast<const struct sockaddr_in6 *>(sa)->sin6_addr.s6_addr;
+                reinterpret_cast<const sockaddr_in6 *>(sa)->sin6_addr.s6_addr;
             if (!memcmp(bytes, ipv4mappedprefix, 12)) {
-                auto a = reinterpret_cast<struct sockaddr_in*>(m->saddr());
+                auto a = reinterpret_cast<sockaddr_in*>(m->saddr());
                 memset(a, 0, sizeof(*a));
                 a->sin_family = AF_INET;
                 memcpy(&a->sin_addr.s_addr, bytes+12, 4);
@@ -176,7 +176,7 @@ IPAddr::IPAddr(const struct sockaddr *sa, bool unmapv4)
             }
         }
         // unmapv4==false or not a v4 mapped address, copy v6 address
-        memcpy(m->saddr(), sa, sizeof(struct sockaddr_in6));
+        memcpy(m->saddr(), sa, sizeof(sockaddr_in6));
         m->ok = true;
     }
     break;
@@ -192,27 +192,27 @@ bool IPAddr::ok() const
     return m->ok;
 }
 
-bool IPAddr::copyToStorage(struct sockaddr_storage *dest) const
+bool IPAddr::copyToStorage(sockaddr_storage *dest) const
 {
     if (!m->ok) {
         *dest = {};
         return false;
     }
-    memcpy(dest, &m->address, sizeof(struct sockaddr_storage));
+    memcpy(dest, &m->address, sizeof(sockaddr_storage));
     return true;
 }
 
-bool IPAddr::copyToAddr(struct sockaddr *dest) const
+bool IPAddr::copyToAddr(sockaddr *dest) const
 {
     if (!m->ok) {
         return false;
     }
     switch (m->saddr()->sa_family) {
     case AF_INET:
-        memcpy(dest, m->saddr(), sizeof(struct sockaddr_in));
+        memcpy(dest, m->saddr(), sizeof(sockaddr_in));
         break;
     case AF_INET6:
-        memcpy(dest, m->saddr(), sizeof(struct sockaddr_in6));
+        memcpy(dest, m->saddr(), sizeof(sockaddr_in6));
         break;
     default:
         return false;
@@ -220,7 +220,7 @@ bool IPAddr::copyToAddr(struct sockaddr *dest) const
     return true;
 }
 
-const struct sockaddr_storage& IPAddr::getaddr() const
+const sockaddr_storage& IPAddr::getaddr() const
 {
     return m->address;
 }
@@ -246,7 +246,7 @@ IPAddr::Scope IPAddr::scopetype() const
     // e.g. fe80::1 could exist on both eth0 and eth1, and needs
     // scopeid 0/1 for complete determination
     if (IN6_IS_ADDR_LINKLOCAL(
-            &(reinterpret_cast<struct sockaddr_in6*>(m->saddr()))->sin6_addr)) {
+            &(reinterpret_cast<sockaddr_in6*>(m->saddr()))->sin6_addr)) {
         return Scope::LINK;
     }
 
@@ -255,7 +255,7 @@ IPAddr::Scope IPAddr::scopetype() const
     // site. They also need a site/scope ID, always 1 if there is only
     // one site defined.
     if (IN6_IS_ADDR_SITELOCAL(
-            &(reinterpret_cast<struct sockaddr_in6*>(m->saddr()))->sin6_addr)) {
+            &(reinterpret_cast<sockaddr_in6*>(m->saddr()))->sin6_addr)) {
         return Scope::SITE;
     }
 
@@ -269,8 +269,8 @@ bool IPAddr::setScopeIdx(const IPAddr& other)
         scopetype() != Scope::LINK || other.scopetype() != Scope::LINK) {
         return false;
     }
-    auto msa6 = reinterpret_cast<struct sockaddr_in6*>(m->saddr());
-    auto osa6 = reinterpret_cast<struct sockaddr_in6*>(other.m->saddr());
+    auto msa6 = reinterpret_cast<sockaddr_in6*>(m->saddr());
+    auto osa6 = reinterpret_cast<sockaddr_in6*>(other.m->saddr());
     msa6->sin6_scope_id = osa6->sin6_scope_id;
     return true;
 }
@@ -284,17 +284,17 @@ std::string IPAddr::straddr(bool setscope, bool forurl) const
 {
     if (!ok())
         return {};
-    
+
     char buf[200];
     buf[0] = 0;
     switch(m->saddr()->sa_family) {
     case AF_INET:
         inet_ntop(m->saddr()->sa_family,
-                  &reinterpret_cast<struct sockaddr_in*>(m->saddr())->sin_addr, buf, 200);
+                  &reinterpret_cast<sockaddr_in*>(m->saddr())->sin_addr, buf, 200);
     break;
     case AF_INET6:
     {
-        auto sa6 = reinterpret_cast<struct sockaddr_in6*>(m->saddr());
+        auto sa6 = reinterpret_cast<sockaddr_in6*>(m->saddr());
         inet_ntop(m->saddr()->sa_family, &sa6->sin6_addr, buf, 200);
         if (!setscope || scopetype() != Scope::LINK) {
             return buf;
@@ -461,7 +461,7 @@ const IPAddr *Interface::firstipv6addr(IPAddr::Scope scope) const
         if (entry.family() == IPAddr::Family::IPV6 &&
             (scope != IPAddr::Scope::LINK ||
              IN6_IS_ADDR_LINKLOCAL(
-                 &(reinterpret_cast<struct sockaddr_in6*>(entry.m->saddr()))->sin6_addr))) {
+                 &(reinterpret_cast<sockaddr_in6*>(entry.m->saddr()))->sin6_addr))) {
             return &entry;
         }
     }
@@ -511,7 +511,7 @@ public:
 
 Interfaces::Internal::Internal()
 {
-    struct ifaddrs *ifap, *ifa;
+    ifaddrs *ifap, *ifa;
 
     /* Get system interface addresses. */
     if (getifaddrs(&ifap) != 0) {
@@ -551,7 +551,7 @@ Interfaces::Internal::Internal()
         // interfaces which do support the function. So, force it and hope for the
         // best:
         ifit->m->setflag(Interface::Flags::MULTICAST);
-#endif        
+#endif
         ifit->m->index = if_nametoindex(ifa->ifa_name);
         switch (ifa->ifa_addr->sa_family) {
         case AF_INET:
@@ -571,14 +571,14 @@ Interfaces::Internal::Internal()
 #ifdef __linux__
         case AF_PACKET:
         {
-            auto sll = reinterpret_cast<struct sockaddr_ll*>(ifa->ifa_addr);
+            auto sll = reinterpret_cast<sockaddr_ll*>(ifa->ifa_addr);
             ifit->m->sethwaddr(reinterpret_cast<const char*>(sll->sll_addr), sll->sll_halen);
         }
         break;
 #else
         case AF_LINK:
         {
-            auto sdl = reinterpret_cast<struct sockaddr_dl*>(ifa->ifa_addr);
+            auto sdl = reinterpret_cast<sockaddr_dl*>(ifa->ifa_addr);
             LOGDEB("NetIF::Interfaces: " << ifa->ifa_name << " has hwaddr\n");
             ifit->m->sethwaddr((const char*)LLADDR(sdl), sdl->sdl_alen);
         }
@@ -657,7 +657,7 @@ Interfaces::Internal::Internal()
     // the adapters, which means that, e.g. if the adapter name is
     // specified in the upplay prefs, it will be need to be set again
     // after changing versions.
-    
+
     /* Get Adapters addresses required size. */
     ret = GetAdaptersAddresses(
         AF_UNSPEC,  GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER, NULL, adapts, &adapts_sz);
@@ -713,7 +713,7 @@ Interfaces::Internal::Internal()
         LOGDEB("NetIF::Interfaces: " << tmpnm << " has hwaddr\n");
         uni_addr = adapts_item->FirstUnicastAddress;
         while (uni_addr) {
-            SOCKADDR *ip_addr = 
+            SOCKADDR *ip_addr =
                 reinterpret_cast<SOCKADDR*>(uni_addr->Address.lpSockaddr);
             switch (ip_addr->sa_family) {
             case AF_INET:
@@ -723,9 +723,9 @@ Interfaces::Internal::Internal()
                 ifit->m->addresses.emplace_back(ip_addr);
                 uint32_t mask =
                     netprefixlentomask(uni_addr->OnLinkPrefixLength);
-                struct sockaddr_in sa = {};
+                sockaddr_in sa = {};
                 sa.sin_addr.s_addr = mask;
-                ifit->m->netmasks.emplace_back((struct sockaddr*)&sa);
+                ifit->m->netmasks.emplace_back((sockaddr*)&sa);
             }
             break;
             case AF_INET6:
@@ -823,15 +823,15 @@ Interface *Interfaces::findByName(const char *nm) const
 static const Interface* interfaceForAddress4(
     uint32_t peeraddr, const std::vector<Interface>& vifs, IPAddr& hostaddr)
 {
-    struct sockaddr_storage sbuf, mbuf;
+    sockaddr_storage sbuf, mbuf;
     for (const auto& netif : vifs) {
         auto addresses = netif.getaddresses();
         for (unsigned int i = 0; i < addresses.first.size(); i++) {
             if (addresses.first[i].family() == IPAddr::Family::IPV4) {
                 addresses.first[i].copyToStorage(&sbuf);
                 addresses.second[i].copyToStorage(&mbuf);
-                uint32_t addr = reinterpret_cast<struct sockaddr_in*>(&sbuf)->sin_addr.s_addr;
-                uint32_t mask = reinterpret_cast<struct sockaddr_in*>(&mbuf)->sin_addr.s_addr;
+                uint32_t addr = reinterpret_cast<sockaddr_in*>(&sbuf)->sin_addr.s_addr;
+                uint32_t mask = reinterpret_cast<sockaddr_in*>(&mbuf)->sin_addr.s_addr;
                 if (
                     // Special case for having a single interface with a netmask of ffffffff, which
                     // is apparently common from FreeBSD jails. Just return it, there is no way we
@@ -847,22 +847,22 @@ static const Interface* interfaceForAddress4(
     }
     return nullptr;
 }
-    
+
 const Interface *Interfaces::interfaceForAddress(
     const IPAddr& addr, const std::vector<Interface>& vifs, IPAddr& hostaddr)
 {
-    struct sockaddr_storage peerbuf;
+    sockaddr_storage peerbuf;
     addr.copyToStorage(&peerbuf);
 
     if (addr.family() == IPAddr::Family::IPV4) {
-        uint32_t peeraddr = reinterpret_cast<struct sockaddr_in*>(
+        uint32_t peeraddr = reinterpret_cast<sockaddr_in*>(
             &peerbuf)->sin_addr.s_addr;
         return interfaceForAddress4(peeraddr, vifs, hostaddr);
     }
 
     if (addr.family() == IPAddr::Family::IPV6)    {
         auto peeraddr =
-            reinterpret_cast<struct sockaddr_in6*>(&peerbuf);
+            reinterpret_cast<sockaddr_in6*>(&peerbuf);
         if (IN6_IS_ADDR_V4MAPPED(&peeraddr->sin6_addr)) {
             uint32_t addr4;
             memcpy(&addr4, &peeraddr->sin6_addr.s6_addr[12], 4);

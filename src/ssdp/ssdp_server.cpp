@@ -109,7 +109,7 @@ int unique_service_name(const char *cmd, SsdpEntity *Evt)
     return 0;
 }
 
-enum SsdpSearchType ssdp_request_type1(const char *cmd)
+SsdpSearchType ssdp_request_type1(const char *cmd)
 {
     if (strstr(cmd, ":all"))
         return SSDP_ALL;
@@ -207,7 +207,7 @@ struct ssdp_thread_data {
         m_packet = nullptr;
         return p;
     }
-    struct sockaddr_storage dest_addr;
+    sockaddr_storage dest_addr;
 private:
     char *m_packet;
 };
@@ -255,7 +255,7 @@ void SSDPEventHandlerJobWorker::work()
 void readFromSSDPSocket(SOCKET socket)
 {
     auto data = new ssdp_thread_data;
-    auto sap = reinterpret_cast<struct sockaddr *>(&data->dest_addr);
+    auto sap = reinterpret_cast<sockaddr *>(&data->dest_addr);
     socklen_t socklen = sizeof(data->dest_addr);
     ssize_t cnt = recvfrom(socket, data->packet(), data->size() - 1, 0, sap, &socklen);
     if (cnt > 0) {
@@ -277,8 +277,8 @@ void readFromSSDPSocket(SOCKET socket)
 static int create_ssdp_sock_v4(SOCKET *ssdpSock)
 {
     int onOff;
-    struct sockaddr_storage ss = {};
-    auto ssdpAddr4 = reinterpret_cast<struct sockaddr_in *>(&ss);
+    sockaddr_storage ss = {};
+    auto ssdpAddr4 = reinterpret_cast<sockaddr_in *>(&ss);
     int ret = UPNP_E_SOCKET_ERROR;
     std::string errorcause;
 
@@ -310,7 +310,7 @@ static int create_ssdp_sock_v4(SOCKET *ssdpSock)
     ssdpAddr4->sin_family = static_cast<sa_family_t>(AF_INET);
     ssdpAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
     ssdpAddr4->sin_port = htons(SSDP_PORT);
-    ret = bind(*ssdpSock, reinterpret_cast<struct sockaddr *>(ssdpAddr4),
+    ret = bind(*ssdpSock, reinterpret_cast<sockaddr *>(ssdpAddr4),
                sizeof(*ssdpAddr4));
     if (ret == -1) {
         errorcause = "bind(INADDR_ANY)";
@@ -322,12 +322,12 @@ static int create_ssdp_sock_v4(SOCKET *ssdpSock)
         auto ipaddr = netif.firstipv4addr();
         if (nullptr == ipaddr)
             continue;
-        struct ip_mreq ssdpMcastAddr = {};
+        ip_mreq ssdpMcastAddr = {};
         ssdpMcastAddr.imr_interface.s_addr =inet_addr(ipaddr->straddr().c_str());
         ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr(SSDP_IP);
         ret = setsockopt(*ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                          reinterpret_cast<char *>(&ssdpMcastAddr),
-                         sizeof(struct ip_mreq));
+                         sizeof(ip_mreq));
         if (ret == -1) {
             errorcause = "setsockopt() IP_ADD_MEMBERSHIP";
             goto error_handler;
@@ -453,23 +453,23 @@ static int create_ssdp_sock_v6(bool isulagua, SOCKET *ssdpSock)
     }
 
     {
-        struct sockaddr_storage ss;
-        auto ssdpAddr6 = reinterpret_cast<struct sockaddr_in6 *>(&ss);
+        sockaddr_storage ss;
+        auto ssdpAddr6 = reinterpret_cast<sockaddr_in6 *>(&ss);
         ss = {};
         ssdpAddr6->sin6_family = static_cast<sa_family_t>(AF_INET6);
         ssdpAddr6->sin6_addr = in6addr_any;
         ssdpAddr6->sin6_scope_id = 0;
         ssdpAddr6->sin6_port = htons(SSDP_PORT);
-        ret = bind(*ssdpSock, reinterpret_cast<struct sockaddr *>(ssdpAddr6),
+        ret = bind(*ssdpSock, reinterpret_cast<sockaddr *>(ssdpAddr6),
                    sizeof(*ssdpAddr6));
         if (ret == -1) {
             errorcause = "bind()";
             goto error_handler;
         }
-        struct ipv6_mreq ssdpMcastAddr = {};
+        ipv6_mreq ssdpMcastAddr = {};
         NetIF::IPAddr ipa(isulagua? SSDP_IPV6_SITELOCAL : SSDP_IPV6_LINKLOCAL);
-        struct sockaddr_in6 sa6;
-        ipa.copyToAddr(reinterpret_cast<struct sockaddr*>(&sa6));
+        sockaddr_in6 sa6;
+        ipa.copyToAddr(reinterpret_cast<sockaddr*>(&sa6));
         memcpy(&ssdpMcastAddr.ipv6mr_multiaddr, &sa6.sin6_addr,
                 sizeof(ssdpMcastAddr.ipv6mr_multiaddr));
         ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_JOIN_GROUP,

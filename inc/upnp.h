@@ -462,7 +462,7 @@ struct Upnp_Action_Request {
     std::vector<std::pair<std::string, std::string> > resdata;
 
     /** @brief [input] IP address of the control point requesting this action. */
-    struct sockaddr_storage CtrlPtIPAddr;
+    sockaddr_storage CtrlPtIPAddr;
 
     /** @brief [input] Client user-agent string */
     std::string Os;
@@ -480,7 +480,7 @@ struct Upnp_Action_Request {
 };
 
 /* compat code for libupnp-1.8 */
-typedef struct Upnp_Action_Request UpnpActionRequest;
+using UpnpActionRequest = Upnp_Action_Request;
 #define UpnpActionRequest_get_ErrCode(x) ((x)->ErrCode)
 #define UpnpActionRequest_set_ErrCode(x, v) ((x)->ErrCode = (v))
 #define UpnpActionRequest_get_Socket(x) ((x)->Socket)
@@ -510,7 +510,7 @@ struct Upnp_Event {
 };
 
 /* compat code for libupnp-1.8 */
-typedef struct Upnp_Event UpnpEvent;
+using UpnpEvent = Upnp_Event;
 #define UpnpEvent_get_SID_cstr(x) ((x)->Sid.c_str())
 #define UpnpEvent_get_EventKey(x) ((x)->EventKey)
 #define UpnpEvent_get_ChangedVariables(x) ((x)->ChangedVariables)
@@ -548,11 +548,11 @@ struct Upnp_Discovery {
     char Ext[LINE_SIZE];           
                      
     /** @brief The host address of the device responding to the search. */
-    struct sockaddr_storage DestAddr;
+    sockaddr_storage DestAddr;
 };
 
 /* compat code for libupnp-1.8 */
-typedef struct Upnp_Discovery UpnpDiscovery;
+using UpnpDiscovery = Upnp_Discovery;
 #define UpnpDiscovery_get_ErrCode(x) ((x)->ErrCode)
 #define UpnpDiscovery_get_Expires(x) ((x)->Expires)
 #define UpnpDiscovery_get_DeviceID_cstr(x) ((x)->DeviceId)
@@ -587,7 +587,7 @@ struct Upnp_Event_Subscribe {
 };
 
 /* compat code for libupnp-1.8 */
-typedef struct Upnp_Event_Subscribe UpnpEventSubscribe;
+using UpnpEventSubscribe = Upnp_Event_Subscribe;
 #define UpnpEventSubscribe_get_SID_cstr(x) ((x)->Sid.c_str())
 #define UpnpEventSubscribe_get_ErrCode(x) ((x)->ErrCode)
 #define UpnpEventSubscribe_get_PublisherUrl_cstr(x) ((x)->PublisherUrl)
@@ -606,7 +606,7 @@ struct Upnp_Subscription_Request {
 };
 
 /* compat code for libupnp-1.8 */
-typedef struct Upnp_Subscription_Request UpnpSubscriptionRequest;
+using UpnpSubscriptionRequest = Upnp_Subscription_Request;
 #define UpnpSubscriptionRequest_get_ServiceId_cstr(x) ((x)->ServiceId)
 #define UpnpSubscriptionRequest_get_UDN_cstr(x) ((x)->UDN)
 #define UpnpSubscriptionRequest_get_SID_cstr(x) ((x)->Sid.c_str())
@@ -634,7 +634,7 @@ struct File_Info {
     std::string content_type;
 
     /** @brief IP address of the control point requesting this action. */
-    struct sockaddr_storage CtrlPtIPAddr;
+    sockaddr_storage CtrlPtIPAddr;
 
     /** @brief Client user-agent string */
     std::string Os;
@@ -651,7 +651,7 @@ struct File_Info {
 };
 
 /* Compat code for libupnp-1.8 */
-typedef struct File_Info UpnpFileInfo;
+using UpnpFileInfo = File_Info;
 #define UpnpFileInfo_get_FileLength(x) ((x)->file_length)
 #define UpnpFileInfo_set_FileLength(x, v) ((x)->file_length = (v))
 #define UpnpFileInfo_get_LastModified(x) ((x)->last_modified)
@@ -1838,7 +1838,7 @@ EXPORT_SPEC int UpnpSetWebServerRootDir(
  * @return the appropriate host:port string or an empty string if no
  *  appropriate value can be found.
  */
-EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const struct sockaddr_storage*);
+EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const sockaddr_storage*);
 
 /*
  * @brief Callback for validating HTTP requests HOST header values.
@@ -1876,7 +1876,7 @@ typedef int (*VDCallback_GetInfo)(
     /** [in] The name of the file to query. */
     const char *filename,
     /** [out] Pointer to a structure to store the information on the file. */
-    struct File_Info *info,
+    File_Info *info,
     const void *cookie,
     const void **request_cookiep
     );
@@ -1897,7 +1897,7 @@ typedef UpnpWebFileHandle (*VDCallback_Open)(
     const char *filename,
     /** [in] The mode in which to open the file.
      * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
-    enum UpnpOpenFileMode Mode,
+    UpnpOpenFileMode Mode,
     const void *cookie,
     const void *request_cookie
     );
@@ -2032,7 +2032,7 @@ struct UpnpVirtualDirCallbacks
  */
 EXPORT_SPEC int UpnpSetVirtualDirCallbacks(
     /** [in] A structure that contains the callback functions. */
-    struct UpnpVirtualDirCallbacks *callbacks );
+    UpnpVirtualDirCallbacks *callbacks );
 
 /**
  * @brief Adds a virtual directory mapping.

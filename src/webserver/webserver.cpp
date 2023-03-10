@@ -1,32 +1,32 @@
 /**************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  * Copyright (c) 2020 J.F. Dockes
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **************************************************************************/
@@ -107,7 +107,7 @@ struct SendInstruction {
        instead of as a local file or a virtualdir entry (this depends
        on the kind of registerrootdevice call) */
     std::string data;
-    /* This is set by the Virtual Dir GetInfo user callback and passed to 
+    /* This is set by the Virtual Dir GetInfo user callback and passed to
        further VirtualDirectory calls for the same request */
     const void* request_cookie{nullptr};
 };
@@ -263,7 +263,7 @@ int web_server_unset_localdoc(const std::string& path)
 }
 
 /* Get file information, local file system version */
-static int get_file_info(const char *filename, struct File_Info *info)
+static int get_file_info(const char *filename, File_Info *info)
 {
     info->content_type.clear();
     struct stat s;
@@ -422,7 +422,7 @@ static bool parseRanges(
  * \brief Other header processing. Only HDR_ACCEPT_LANGUAGE for now.
  */
 static int CheckOtherHTTPHeaders(
-    MHDTransaction *mhdt, struct SendInstruction *RespInstr, int64_t)
+    MHDTransaction *mhdt, SendInstruction *RespInstr, int64_t)
 {
     for (const auto& header : mhdt->headers) {
         /* find header type. */
@@ -451,17 +451,17 @@ static int CheckOtherHTTPHeaders(
 static int process_request(
     MHDTransaction *mhdt,
     /*! [out] Type of response: what source type the data will come from. */
-    enum resp_type *rtype,
+    resp_type *rtype,
     /*! [out] Headers for the response. */
     std::map<std::string, std::string>& headers,
     /*! [out] Computed actual file path. */
     std::string& filename,
     /*! [out] Send Instruction object where the response is set up. */
-    struct SendInstruction *RespInstr)
+    SendInstruction *RespInstr)
 {
-    struct File_Info finfo;
+    File_Info finfo;
     LocalDoc localdoc;
-    
+
     assert(mhdt->method == HTTPMETHOD_GET ||
            mhdt->method == HTTPMETHOD_HEAD ||
            mhdt->method == HTTPMETHOD_POST ||
@@ -617,7 +617,7 @@ static int process_request(
         RespInstr->ReadSendSize = finfo.file_length - RespInstr->offset;
     }
     RespInstr->TotalSize = finfo.file_length;
-    
+
     int code = CheckOtherHTTPHeaders(mhdt, RespInstr, finfo.file_length);
     if (code != HTTP_OK) {
         return code;
@@ -641,7 +641,7 @@ static int process_request(
     }
     {
         std::string date = make_date_string(0);
-        if (!date.empty())    
+        if (!date.empty())
             headers["date"] = date;
         if (finfo.last_modified) {
             headers["last-modified"] = make_date_string(finfo.last_modified);
@@ -692,12 +692,12 @@ static void vFileFreeCallback (void *cls)
 static void web_server_callback(MHDTransaction *mhdt)
 {
     int ret;
-    auto rtype = static_cast<enum resp_type>(0);
+    auto rtype = static_cast<resp_type>(0);
     std::map<std::string,std::string> headers;
     std::string filename;
-    struct SendInstruction RespInstr;
+    SendInstruction RespInstr;
 
-    /* Process request should create the different kind of header depending 
+    /* Process request should create the different kind of header depending
        on the the type of request. */
     ret = process_request(mhdt, &rtype, headers, filename, &RespInstr);
     if (ret != HTTP_OK) {
@@ -786,7 +786,7 @@ static void web_server_callback(MHDTransaction *mhdt)
         MHD_add_response_header(mhdt->response, "SERVER", get_sdk_device_info("").c_str());
     }
     MHD_add_response_header(mhdt->response, "Accept-Ranges", "bytes");
-    
+
     UpnpPrintf(UPNP_DEBUG, HTTP, __FILE__, __LINE__,
                "webserver: response ready. Status %d\n", mhdt->httpstatus);
 }

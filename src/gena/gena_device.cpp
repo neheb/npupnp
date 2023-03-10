@@ -62,7 +62,7 @@ static constexpr auto XML_PROPERTYSET_HEADER =
 int genaUnregisterDevice(UpnpDevice_Handle device_handle)
 {
     int ret = 0;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
 
     HandleLock();
     if (GetHandleInfo(device_handle, &handle_info) != HND_DEVICE) {
@@ -149,7 +149,7 @@ static int genaNotify(const std::string& propertySet, const subscription *sub)
         curl_easy_setopt(easy, CURLOPT_POSTFIELDS, propertySet.c_str());
         curl_easy_setopt(easy, CURLOPT_CUSTOMREQUEST, "NOTIFY");
 
-        struct curl_slist *list = nullptr;
+        curl_slist *list = nullptr;
         list = curl_slist_append(list, "NT: upnp:event");
         list = curl_slist_append(list, "NTS: upnp:propchange");
         list = curl_slist_append(list,(std::string("SID: ") + sub->sid).c_str());
@@ -235,7 +235,7 @@ void GenaNotifyJobWorker::work()
     service_info *service;
     subscription sub_copy;
     int return_code;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
 
     /* This should be a HandleLock and not a HandleReadLock otherwise if there
      * is a lot of notifications, then multiple threads will acquire a read
@@ -319,7 +319,7 @@ int genaInitNotifyXML(
 
     subscription *sub = nullptr;
     service_info *service = nullptr;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
 
     UpnpPrintf(UPNP_DEBUG, GENA, __FILE__, __LINE__,
                "genaInitNotifyXML: props: %s\n", propertySet.c_str());
@@ -475,7 +475,7 @@ int genaNotifyAllXML(
     Notification *thread_struct = nullptr;
 
     service_info *service = nullptr;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
 
     UpnpPrintf(UPNP_DEBUG, GENA, __FILE__, __LINE__,
                "genaNotifyAllXML: props: %s\n", propertySet.c_str());
@@ -607,7 +607,7 @@ static int respond_ok(MHDTransaction *mhdt, int time_out, subscription *sub,
 static bool callStrangerCheck(
     const std::string& surl, uri_type& temp, const NetIF::Interface *clnetif, NetIF::IPAddr& claddr)
 {
-    NetIF::IPAddr subsaddr(reinterpret_cast<struct sockaddr*>(&temp.hostport.IPaddress));
+    NetIF::IPAddr subsaddr(reinterpret_cast<sockaddr*>(&temp.hostport.IPaddress));
     if (!subsaddr.ok()) {
         UpnpPrintf(UPNP_INFO,GENA,__FILE__,__LINE__,"create_url_list: bad addr %s\n",surl.c_str());
         return false;
@@ -653,7 +653,7 @@ static int create_url_list(
     out->clear();
 
     // Get information for the client address
-    NetIF::IPAddr claddr(reinterpret_cast<struct sockaddr*>(mhdt->client_address));
+    NetIF::IPAddr claddr(reinterpret_cast<sockaddr*>(mhdt->client_address));
     if (!claddr.ok()) {
         UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__,
                    "create_url_list: can't determine client addr\n");
@@ -721,11 +721,11 @@ static int create_url_list(
 
 void gena_process_subscription_request(MHDTransaction *mhdt)
 {
-    struct Upnp_Subscription_Request request_struct = {};
+    Upnp_Subscription_Request request_struct = {};
     int return_code = 1;
     int time_out = 1801;
     service_info *service;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
     void *cookie;
     Upnp_FunPtr callback_fun;
     UpnpDevice_Handle device_handle;
@@ -861,7 +861,7 @@ void gena_process_subscription_renewal_request(MHDTransaction *mhdt)
 {
     subscription *sub;
     service_info *service;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
     UpnpDevice_Handle device_handle;
     std::string event_url_path;
 
@@ -944,7 +944,7 @@ void gena_process_unsubscribe_request(MHDTransaction *mhdt)
                    "gena_process_unsubscribe_request\n");
 
     service_info *service;
-    struct Handle_Info *handle_info;
+    Handle_Info *handle_info;
     UpnpDevice_Handle device_handle;
 
     /* if a CALLBACK or NT header is present, then it is an error */

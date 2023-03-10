@@ -1,31 +1,31 @@
 /*******************************************************************************
  *
- * Copyright (c) 2000-2003 Intel Corporation 
- * All rights reserved. 
- * Copyright (c) 2012 France Telecom All rights reserved. 
+ * Copyright (c) 2000-2003 Intel Corporation
+ * All rights reserved.
+ * Copyright (c) 2012 France Telecom All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- * this list of conditions and the following disclaimer. 
- * - Redistributions in binary form must reproduce the above copyright notice, 
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * - Neither name of Intel Corporation nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither name of Intel Corporation nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
@@ -45,14 +45,14 @@ struct uri_type;
 
 /* method in a HTTP request. */
 typedef enum {
-    HTTPMETHOD_POST, 
-    HTTPMETHOD_MPOST, 
-    HTTPMETHOD_SUBSCRIBE, 
-    HTTPMETHOD_UNSUBSCRIBE, 
-    HTTPMETHOD_NOTIFY, 
+    HTTPMETHOD_POST,
+    HTTPMETHOD_MPOST,
+    HTTPMETHOD_SUBSCRIBE,
+    HTTPMETHOD_UNSUBSCRIBE,
+    HTTPMETHOD_NOTIFY,
     HTTPMETHOD_GET,
-    HTTPMETHOD_HEAD, 
-    HTTPMETHOD_MSEARCH, 
+    HTTPMETHOD_HEAD,
+    HTTPMETHOD_MSEARCH,
     HTTPMETHOD_UNKNOWN,
     SOAPMETHOD_POST,
     HTTPMETHOD_SIMPLEGET
@@ -70,8 +70,8 @@ std::string query_encode(const std::string& qs);
 /* Context for a microhttpd request/response */
 struct MHDTransaction {
 public:
-    struct MHD_Connection *conn{nullptr};
-    struct sockaddr_storage *client_address;
+    MHD_Connection *conn{nullptr};
+    sockaddr_storage *client_address;
     std::string url;
     http_method_t method;
     std::string version;
@@ -79,10 +79,10 @@ public:
     std::map<std::string, std::string> queryvalues;
     std::string postdata;
     /* Set by callback */
-    struct MHD_Response *response{nullptr};
+    MHD_Response *response{nullptr};
     int httpstatus;
 
-    void copyClientAddress(struct sockaddr_storage *dest) const;
+    void copyClientAddress(sockaddr_storage *dest) const;
     // Returns false if header not found, else copies it
     bool copyHeader(const std::string& name, std::string& value);
 };

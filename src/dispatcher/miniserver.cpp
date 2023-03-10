@@ -95,7 +95,7 @@ static std::mutex gMServStateMutex;
 static std::condition_variable gMServStateCV;
 static MiniServerSockArray *miniSocket;
 static MiniServerState gMServState = MSERV_IDLE;
-static struct MHD_Daemon *mhd;
+static MHD_Daemon *mhd;
 
 #ifdef INTERNAL_WEB_SERVER
 static MiniServerCallback gGetCallback = nullptr;
@@ -129,7 +129,7 @@ static UPNP_INLINE void fdset_if_valid(SOCKET sock, fd_set *set)
     }
 }
 
-static MHD_Result headers_cb(void *cls, enum MHD_ValueKind, const char *k, const char *value)
+static MHD_Result headers_cb(void *cls, MHD_ValueKind, const char *k, const char *value)
 {
     auto mhtt = static_cast<MHDTransaction *>(cls);
     std::string key(k);
@@ -148,14 +148,14 @@ static MHD_Result headers_cb(void *cls, enum MHD_ValueKind, const char *k, const
 }
 
 static MHD_Result show_resp_headers_cb(
-    void *, enum MHD_ValueKind, const char *k, const char *value)
+    void *, MHD_ValueKind, const char *k, const char *value)
 {
     UpnpPrintf(UPNP_DEBUG, MSERV, __FILE__, __LINE__,
                "miniserver:resp_header: [%s] -> [%s]\n", k, value);
     return MHD_YES;
 }
 
-static MHD_Result queryvalues_cb(void *cls, enum MHD_ValueKind,
+static MHD_Result queryvalues_cb(void *cls, MHD_ValueKind,
                                  const char *key, const char *value)
 {
     auto mhdt = static_cast<MHDTransaction *>(cls);
@@ -180,8 +180,8 @@ static const std::map<std::string, int> strmethtometh {
         };
 
 void request_completed_cb(
-    void *, struct MHD_Connection *,
-    void **con_cls, enum MHD_RequestTerminationCode)
+    void *, MHD_Connection *,
+    void **con_cls, MHD_RequestTerminationCode)
 {
     if (nullptr == con_cls)
         return;
@@ -224,7 +224,7 @@ static VHH_Status validate_host_header(MHDTransaction *mhdt, NetIF::IPAddr& clad
         return VHH_NO;
     }
     // Parse the value
-    struct hostport_type hostport;
+    hostport_type hostport;
     if (UPNP_E_INVALID_URL == parse_hostport(hostit->second.c_str(), &hostport, false)) {
         UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
                    "answer_to_connection: bad HOST header %s in request from %s\n",
@@ -308,8 +308,8 @@ static std::string rebuild_url_from_mhdt(
 }
 
 static MHD_Result answer_to_connection(
-    void *, struct MHD_Connection *conn, 
-    const char *url, const char *method, const char *version, 
+    void *, MHD_Connection *conn,
+    const char *url, const char *method, const char *version,
     const char *upload_data, size_t *upload_data_size,
     void **con_cls)
 {
@@ -322,7 +322,7 @@ static MHD_Result answer_to_connection(
         *con_cls = mhdt;
         MHD_get_connection_values(conn, MHD_HEADER_KIND, headers_cb, mhdt);
         mhdt->client_address =
-            reinterpret_cast<struct sockaddr_storage*>(
+            reinterpret_cast<sockaddr_storage*>(
                 MHD_get_connection_info (conn,MHD_CONNECTION_INFO_CLIENT_ADDRESS)->client_addr);
 
         MHD_get_connection_values(conn, MHD_GET_ARGUMENT_KIND, queryvalues_cb, mhdt);
@@ -348,7 +348,7 @@ static MHD_Result answer_to_connection(
         if (g_optionFlags & UPNP_FLAG_NO_HOST_VALIDATE) {
             return MHD_YES;
         }
-        
+
         NetIF::IPAddr claddr(reinterpret_cast<sockaddr*>(mhdt->client_address));
         switch (validate_host_header(mhdt, claddr)) {
         case VHH_YES: return MHD_YES;
@@ -362,7 +362,7 @@ static MHD_Result answer_to_connection(
             return MHD_NO;
         }
         UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__, "Redirecting to [%s]\n", aurl.c_str());
-        struct MHD_Response *response = MHD_create_response_from_buffer(0,nullptr,MHD_RESPMEM_PERSISTENT);
+        MHD_Response *response = MHD_create_response_from_buffer(0,nullptr,MHD_RESPMEM_PERSISTENT);
         if (nullptr == response ) {
             UpnpPrintf(UPNP_DEBUG, MSERV, __FILE__, __LINE__,
                        "answer_to_connection: can't create redirect\n");
@@ -382,9 +382,9 @@ static MHD_Result answer_to_connection(
     }
     UpnpPrintf(UPNP_DEBUG, MSERV, __FILE__, __LINE__,
                "answer_to_connection: end of upload, postdata:\n[%s]\n", mhdt->postdata.c_str());
-    
+
     /* We now have the full request */
-    
+
     MiniServerCallback callback;
     switch (mhdt->method) {
         /* Soap Call */
@@ -441,8 +441,8 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
 {
     ssize_t byteReceived;
     socklen_t len;
-    struct sockaddr_storage ss;
-    auto fromaddr = reinterpret_cast<struct sockaddr *>(&ss);
+    sockaddr_storage ss;
+    auto fromaddr = reinterpret_cast<sockaddr *>(&ss);
     char requestBuf[100];
 
     if (FD_ISSET(ssock, set)) {
@@ -450,7 +450,7 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
         ss = {};
         byteReceived = recvfrom(
             ssock, requestBuf, static_cast<size_t>(25), 0, fromaddr, &len);
-        
+
         if (byteReceived > 0) {
             requestBuf[byteReceived] = '\0';
             NetIF::IPAddr ipa{fromaddr};
@@ -567,20 +567,20 @@ static int get_port(
     /*! [out] The port value if successful, otherwise, untouched. */
     uint16_t *port)
 {
-    struct sockaddr_storage sockinfo;
+    sockaddr_storage sockinfo;
     socklen_t len;
     int code;
 
     len = sizeof(sockinfo);
     code = getsockname(
-        sockfd, reinterpret_cast<struct sockaddr *>(&sockinfo), &len);
+        sockfd, reinterpret_cast<sockaddr *>(&sockinfo), &len);
     if (code == -1) {
         return -1;
     }
     if (sockinfo.ss_family == AF_INET) {
-        *port = ntohs(reinterpret_cast<struct sockaddr_in*>(&sockinfo)->sin_port);
+        *port = ntohs(reinterpret_cast<sockaddr_in*>(&sockinfo)->sin_port);
     } else if(sockinfo.ss_family == AF_INET6) {
-        *port = ntohs(reinterpret_cast<struct sockaddr_in6*>(&sockinfo)->sin6_port);
+        *port = ntohs(reinterpret_cast<sockaddr_in6*>(&sockinfo)->sin6_port);
     }
     UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
                "sockfd = %d, .... port = %d\n", sockfd, static_cast<int>(*port));
@@ -589,10 +589,10 @@ static int get_port(
 }
 
 /*!
- * \brief Creates the miniserver STOP socket. This socket is created and 
+ * \brief Creates the miniserver STOP socket. This socket is created and
  *    listened on to know when it is time to stop the Miniserver.
  *
- * \return 
+ * \return
  * \li \c UPNP_E_OUTOF_SOCKET: Failed to create a socket.
  * \li \c UPNP_E_SOCKET_BIND: Bind() failed.
  * \li \c UPNP_E_INTERNAL_ERROR: Port returned by the socket layer is < 0.
@@ -601,7 +601,7 @@ static int get_port(
 static int get_miniserver_stopsock(MiniServerSockArray *out)
 {
     char errorBuffer[ERROR_BUFFER_LEN];
-    struct sockaddr_in stop_sockaddr;
+    sockaddr_in stop_sockaddr;
     int ret = 0;
 
     out->miniServerStopSock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -616,7 +616,7 @@ static int get_miniserver_stopsock(MiniServerSockArray *out)
     stop_sockaddr.sin_family = static_cast<sa_family_t>(AF_INET);
     stop_sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     ret = bind(out->miniServerStopSock,
-               reinterpret_cast<struct sockaddr *>(&stop_sockaddr),
+               reinterpret_cast<sockaddr *>(&stop_sockaddr),
                sizeof(stop_sockaddr));
     if (ret == SOCKET_ERROR) {
         UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
@@ -652,14 +652,14 @@ static int available_port(int reqport)
 
     int port = reqport <= 0 ? APPLICATION_LISTENING_PORT : reqport;
     int ret = UPNP_E_SOCKET_BIND;
-    struct sockaddr_storage saddr = {};
-    auto ip = reinterpret_cast<struct sockaddr_in*>(&saddr);
+    sockaddr_storage saddr = {};
+    auto ip = reinterpret_cast<sockaddr_in*>(&saddr);
     ip->sin_family = AF_INET;
     ip->sin_addr.s_addr = htonl(INADDR_ANY);
     for (int i = 0; i < 20; i++) {
         ip->sin_port = htons(static_cast<uint16_t>(port));
-        if (bind(sock, reinterpret_cast<struct sockaddr*>(&saddr),
-                 sizeof(struct sockaddr_in)) == 0) {
+        if (bind(sock, reinterpret_cast<sockaddr*>(&saddr),
+                 sizeof(sockaddr_in)) == 0) {
             ret = port;
             break;
         }
@@ -758,7 +758,7 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
             goto out;
         }
     }
-    
+
 #ifdef INTERNAL_WEB_SERVER
     port = available_port(static_cast<int>(*listen_port4));
     if (port < 0) {
@@ -778,14 +778,14 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
         mhdflags |= MHD_USE_IPv6 | MHD_USE_DUAL_STACK;
     }
 #endif /* UPNP_ENABLE_IPV6 */
-    
+
     mhd = MHD_start_daemon(
         mhdflags, port,
         filter_connections, nullptr, /* Accept policy callback and arg */
         &answer_to_connection, nullptr, /* Request handler and arg */
         MHD_OPTION_NOTIFY_COMPLETED, request_completed_cb, nullptr,
         MHD_OPTION_CONNECTION_TIMEOUT, static_cast<unsigned int>(UPNP_TIMEOUT),
-        MHD_OPTION_EXTERNAL_LOGGER, mhdlogger, nullptr, 
+        MHD_OPTION_EXTERNAL_LOGGER, mhdlogger, nullptr,
         MHD_OPTION_END);
     if (nullptr == mhd) {
         UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
@@ -808,9 +808,9 @@ out:
 int StopMiniServer()
 {
     char errorBuffer[ERROR_BUFFER_LEN];
-    socklen_t socklen = sizeof (struct sockaddr_in);
+    socklen_t socklen = sizeof (sockaddr_in);
     SOCKET sock;
-    struct sockaddr_in stopaddr;
+    sockaddr_in stopaddr;
     char buf[256] = "ShutDown";
     size_t bufLen = strlen(buf);
 
@@ -832,7 +832,7 @@ int StopMiniServer()
 
     while (gMServState != MSERV_IDLE) {
         sendto(sock, buf, bufLen, 0,
-               reinterpret_cast<struct sockaddr *>(&stopaddr), socklen);
+               reinterpret_cast<sockaddr *>(&stopaddr), socklen);
         gMServStateCV.wait_for(lck, std::chrono::seconds(1));
     }
     UpnpCloseSocket(sock);

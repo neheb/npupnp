@@ -90,7 +90,7 @@
 #define DEFAULT_MAXAGE 1800
 
 /*! This structure is for virtual directory callbacks */
-struct VirtualDirCallbacks virtualDirCallback;
+VirtualDirCallbacks virtualDirCallback;
 
 // Mutex to synchronize handles (root device or control point
 // handle). This used to be an rwlock but this was probably not worth
@@ -765,7 +765,7 @@ EXPORT_SPEC int UpnpFinish()
 #ifdef INCLUDE_CLIENT_APIS
     UpnpClient_Handle client_handle;
 #endif
-    struct Handle_Info *temp;
+    Handle_Info *temp;
 
     if (UpnpSdkInit != 1)
         return UPNP_E_FINISH;
@@ -819,9 +819,9 @@ EXPORT_SPEC int UpnpSetHostValidateCallback(
 }
 
 
-EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const struct sockaddr_storage* clsock)
+EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const sockaddr_storage* clsock)
 {
-    NetIF::IPAddr claddr(reinterpret_cast<const struct sockaddr*>(clsock));
+    NetIF::IPAddr claddr(reinterpret_cast<const sockaddr*>(clsock));
     NetIF::IPAddr hostaddr;
     const NetIF::Interface *itf =
         NetIF::Interfaces::interfaceForAddress(claddr, g_netifs, hostaddr);
@@ -938,7 +938,7 @@ static int FreeHandle(int handleindex)
 }
 
 static int checkLockHandle(Upnp_Handle_Type tp, int Hnd,
-                           struct Handle_Info **HndInfo, bool readlock=false)
+                           Handle_Info **HndInfo, bool readlock=false)
 {
     if (readlock) {
         HandleReadLock();
@@ -966,7 +966,7 @@ static int registerRootDeviceAllForms(
     UpnpDevice_Handle *Hnd,
     const char *LowerDescUrl)
 {
-    struct Handle_Info *HInfo = nullptr;
+    Handle_Info *HInfo = nullptr;
     int retVal = 0;
 #if EXCLUDE_GENA == 0
     int hasServiceTable = 0;
@@ -1077,7 +1077,7 @@ EXPORT_SPEC int UpnpRegisterRootDevice4(
 EXPORT_SPEC int UpnpDeviceSetProduct(
     UpnpDevice_Handle Hnd, const char *product, const char *version)
 {
-    struct Handle_Info *HInfo = nullptr;
+    Handle_Info *HInfo = nullptr;
     if (UpnpSdkInit != 1) {
         return UPNP_E_INVALID_HANDLE;
     }
@@ -1103,7 +1103,7 @@ EXPORT_SPEC int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd, int Powe
     UpnpPrintf(UPNP_DEBUG,API, __FILE__, __LINE__, "UpnpUnRegisterRootDevice\n");
 
     int retVal = 0;
-    struct Handle_Info *HInfo = nullptr;
+    Handle_Info *HInfo = nullptr;
 
     if (UpnpSdkInit != 1)
         return UPNP_E_FINISH;
@@ -1141,7 +1141,7 @@ EXPORT_SPEC int UpnpUnRegisterRootDeviceLowPower(UpnpDevice_Handle Hnd, int Powe
 #ifdef INCLUDE_CLIENT_APIS
 int UpnpRegisterClient(Upnp_FunPtr Fun, const void *Cookie, UpnpClient_Handle *Hnd)
 {
-    struct Handle_Info *HInfo;
+    Handle_Info *HInfo;
 
     if (UpnpSdkInit != 1)
         return UPNP_E_FINISH;
@@ -1191,7 +1191,7 @@ void UpnpClientSetProduct(
 
 int UpnpUnRegisterClient(UpnpClient_Handle Hnd)
 {
-    struct Handle_Info *HInfo;
+    Handle_Info *HInfo;
 
     if (UpnpSdkInit != 1)
         return UPNP_E_FINISH;
@@ -1451,7 +1451,7 @@ int UpnpSendAdvertisementLowPower(
     UpnpDevice_Handle Hnd, int Exp,
     int PowerState, int SleepPeriod, int RegistrationState)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
 
     if(UpnpSdkInit != 1) {
         return UPNP_E_FINISH;
@@ -1512,7 +1512,7 @@ int UpnpSendAdvertisementLowPower(
 int UpnpSearchAsync(
     UpnpClient_Handle Hnd, int Mx, const char *Target, const void *Cookie)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
     int retVal;
 
     if (UpnpSdkInit != 1) {
@@ -1550,7 +1550,7 @@ int UpnpSearchAsync(
 #ifdef INCLUDE_DEVICE_APIS
 int UpnpSetMaxSubscriptions(UpnpDevice_Handle Hnd, int MaxSubscriptions)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
 
     if(UpnpSdkInit != 1) {
         return UPNP_E_FINISH;
@@ -1574,7 +1574,7 @@ int UpnpSetMaxSubscriptions(UpnpDevice_Handle Hnd, int MaxSubscriptions)
 int UpnpSetMaxSubscriptionTimeOut(UpnpDevice_Handle Hnd,
                                   int MaxSubscriptionTimeOut)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
 
     if (UpnpSdkInit != 1) {
         return UPNP_E_FINISH;
@@ -1601,7 +1601,7 @@ int UpnpSubscribe(
     UpnpClient_Handle Hnd, const char *EvtUrl, int *TimeOut, Upnp_SID& SubsId)
 {
     int retVal;
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "UpnpSubscribe\n");
 
@@ -1633,7 +1633,7 @@ exit_function:
 #ifdef INCLUDE_CLIENT_APIS
 int UpnpUnSubscribe(UpnpClient_Handle Hnd, const Upnp_SID& SubsId)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
     int retVal;
     std::string SubsIdTmp;
 
@@ -1665,7 +1665,7 @@ exit_function:
 int UpnpRenewSubscription(UpnpClient_Handle Hnd, int *TimeOut,
                           const Upnp_SID& SubsId)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
     int retVal;
     std::string SubsIdTmp;
 
@@ -1702,7 +1702,7 @@ int UpnpNotify(
     UpnpDevice_Handle Hnd, const char *DevID, const char *ServName,
     const char **VarName, const char **NewVal, int cVariables)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
     int retVal;
 
     if (UpnpSdkInit != 1) {
@@ -1730,7 +1730,7 @@ int UpnpNotify(
 int UpnpNotifyXML(UpnpDevice_Handle Hnd, const char *DevID,
                   const char *ServName, const std::string& propset)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
     int retVal;
 
     if (UpnpSdkInit != 1) {
@@ -1759,7 +1759,7 @@ int UpnpAcceptSubscription(
     const Upnp_SID& SubsId)
 {
     int ret = 0;
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "UpnpAcceptSubscription\n");
 
@@ -1789,7 +1789,7 @@ int UpnpAcceptSubscriptionXML(
     const Upnp_SID& SubsId)
 {
     int ret = 0;
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
 
     UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "UpnpAcceptSubscriptionXML\n");
 
@@ -1837,7 +1837,7 @@ int UpnpSendAction(
     int *errcodep,
     std::string&  errdesc)
 {
-    struct Handle_Info *SInfo = nullptr;
+    Handle_Info *SInfo = nullptr;
 
     if (UpnpSdkInit != 1) {
         return UPNP_E_FINISH;
@@ -1892,13 +1892,13 @@ int UpnpDownloadUrlItem(const std::string& url,
 /* Get callback function ptr from a handle. */
 Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 {
-    return (static_cast<struct Handle_Info *>(HandleTable[Hnd]))->Callback;
+    return (static_cast<Handle_Info *>(HandleTable[Hnd]))->Callback;
 }
 
 /* Assumes at most one client */
 Upnp_Handle_Type GetClientHandleInfo(
     UpnpClient_Handle *client_handle_out,
-    struct Handle_Info **HndInfo)
+    Handle_Info **HndInfo)
 {
     Upnp_Handle_Type ret = HND_CLIENT;
     UpnpClient_Handle client;
@@ -1926,7 +1926,7 @@ Upnp_Handle_Type GetClientHandleInfo(
 Upnp_Handle_Type GetDeviceHandleInfo(
     UpnpDevice_Handle start,
     UpnpDevice_Handle *device_handle_out,
-    struct Handle_Info **HndInfo)
+    Handle_Info **HndInfo)
 {
 #ifdef INCLUDE_DEVICE_APIS
     if (start < 0 || start >= NUM_HANDLE-1) {
@@ -1954,7 +1954,7 @@ Upnp_Handle_Type GetDeviceHandleInfo(
 /* Check if we've got a registered device of the address family specified. */
 Upnp_Handle_Type GetDeviceHandleInfoForPath(
     const std::string& path, UpnpDevice_Handle *devhdl,
-    struct Handle_Info **HndInfo, service_info **serv_info)
+    Handle_Info **HndInfo, service_info **serv_info)
 {
     *devhdl = -1;
     *serv_info = nullptr;
@@ -1981,7 +1981,7 @@ Upnp_Handle_Type GetDeviceHandleInfoForPath(
 
 
 Upnp_Handle_Type GetHandleInfo(UpnpClient_Handle Hnd,
-                               struct Handle_Info **HndInfo)
+                               Handle_Info **HndInfo)
 {
     Upnp_Handle_Type ret = HND_INVALID;
 
@@ -1994,7 +1994,7 @@ Upnp_Handle_Type GetHandleInfo(UpnpClient_Handle Hnd,
         //           "GetHandleInfo: HTable[%d] is NULL\n",
         //           Hnd);
     } else if (HandleTable[Hnd] != nullptr) {
-        *HndInfo = static_cast<struct Handle_Info *>(HandleTable[Hnd]);
+        *HndInfo = static_cast<Handle_Info *>(HandleTable[Hnd]);
         ret = (*HndInfo)->HType;
     }
 
@@ -2003,9 +2003,9 @@ Upnp_Handle_Type GetHandleInfo(UpnpClient_Handle Hnd,
 
 int PrintHandleInfo(UpnpClient_Handle Hnd)
 {
-    struct Handle_Info * HndInfo;
+    Handle_Info * HndInfo;
     if (HandleTable[Hnd] != nullptr) {
-        HndInfo = static_cast<struct Handle_Info*>(HandleTable[Hnd]);
+        HndInfo = static_cast<Handle_Info*>(HandleTable[Hnd]);
         UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                    "Handle_%d Type_%d: \n", Hnd, HndInfo->HType);
 #ifdef INCLUDE_DEVICE_APIS
@@ -2106,7 +2106,7 @@ int UpnpIsWebserverEnabled()
     return bWebServerState == static_cast<WebServerState>(WEB_SERVER_ENABLED);
 }
 
-int UpnpSetVirtualDirCallbacks(struct UpnpVirtualDirCallbacks *callbacks)
+int UpnpSetVirtualDirCallbacks(UpnpVirtualDirCallbacks *callbacks)
 {
     int ret = 0;
 
