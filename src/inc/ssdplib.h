@@ -63,7 +63,7 @@
 #endif
 
 /*! Enumeration to define all different types of ssdp searches */
-typedef enum SsdpSearchType {
+enum SsdpSearchType {
     /*! Unknown search command. */
     SSDP_SERROR = -1,
     SSDP_ALL,
@@ -71,7 +71,7 @@ typedef enum SsdpSearchType {
     SSDP_DEVICEUDN,
     SSDP_DEVICETYPE,
     SSDP_SERVICE
-} SType;
+};
 
 // Struct used to remember what searches a client CP has outstanding.
 // These are stored in a list on the client handle entry. We compare

@@ -61,7 +61,7 @@ public:
 #define SCHED_OTHER 0
 #endif
 struct ThreadPoolAttr {
-    typedef int PolicyType;
+    using PolicyType = int;
     enum TPSpecialValues{INFINITE_THREADS = -1};
 
     /*! ThreadPool will always maintain at least this many threads. */

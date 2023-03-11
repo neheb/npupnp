@@ -65,7 +65,10 @@ extern int g_UpnpSdkEQMaxAge;
 /* 30-second timeout */
 #define UPNP_TIMEOUT    30
 
-typedef enum {HND_INVALID=-1,HND_CLIENT,HND_DEVICE} Upnp_Handle_Type;
+enum Upnp_Handle_Type { HND_INVALID = -1,
+                        HND_CLIENT,
+                        HND_DEVICE,
+};
 
 struct SsdpSearchArg;
 

@@ -31,8 +31,7 @@
  **************************************************************************/
 
 #ifndef INTERNAL_CONFIG_H
-#define INTERNAL_CONFIG_H 
-
+#define INTERNAL_CONFIG_H
 
 #include "autoconfig.h"
 
@@ -40,7 +39,7 @@
 
 #ifdef _MSC_VER
 /* no ssize_t defined for VC */
-typedef int ssize_t;
+using ssize_t = int;
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
 #define getpid _getpid
@@ -64,19 +63,18 @@ typedef int ssize_t;
 /*!
  *  \name Compile time configuration options
  *
- *  The Linux SDK for UPnP Devices contains some compile-time parameters 
- *  that effect the behavior of the SDK.  All configuration options are 
+ *  The Linux SDK for UPnP Devices contains some compile-time parameters
+ *  that effect the behavior of the SDK.  All configuration options are
  *  located in {\tt src/inc/config.h}.
  *
  * @{
  */
 
-
 /*!
  *  \name THREAD_IDLE_TIME
  *
  *  The {\tt THREAD_IDLE_TIME} constant determines when a thread will be
- *  removed from the thread pool and returned to the operating system. When 
+ *  removed from the thread pool and returned to the operating system. When
  *  a thread in the thread pool has been idle for this number of milliseconds
  *  the thread will be released from the thread pool.  The default value is
  *  5000 milliseconds (5 seconds).
@@ -86,21 +84,19 @@ typedef int ssize_t;
 #define THREAD_IDLE_TIME 5000
 /* @} */
 
-
 /*!
  * \name JOBS_PER_THREAD
  *
  * The {\tt JOBS_PER_THREAD} constant determines when a new thread will be
  * allocated to the thread pool inside the  SDK. The thread pool will
- * try and maintain this jobs/thread ratio. When the jobs/thread ratio 
- * becomes greater than this, then a new thread (up to the max) will be 
+ * try and maintain this jobs/thread ratio. When the jobs/thread ratio
+ * becomes greater than this, then a new thread (up to the max) will be
  * allocated to the thread pool.  The default ratio is 10 jobs/thread.
  *
  * @{
  */
 #define JOBS_PER_THREAD 10
 /* @} */
-
 
 /*!
  * \name MIN_THREADS
@@ -114,27 +110,25 @@ typedef int ssize_t;
  *
  * @{
  */
-#define MIN_THREADS 2 
+#define MIN_THREADS 2
 /* @} */
-
 
 /*!
  * \name MAX_THREADS
  *
  * The {\tt MAX_THREADS} constant defines the maximum number of threads the
  * thread pool inside the SDK will create.  These threads are used
- * for both callbacks into applications built on top of the library and also 
- * for making connections to other control points and devices.  It is not 
- * recommended that this value be below 10, since the threads are 
+ * for both callbacks into applications built on top of the library and also
+ * for making connections to other control points and devices.  It is not
+ * recommended that this value be below 10, since the threads are
  * necessary for correct operation.  This value can be increased for greater
- * performance in operation at the expense of greater memory overhead.  The 
+ * performance in operation at the expense of greater memory overhead.  The
  * default value is 12.
  *
  * @{
  */
-#define MAX_THREADS 12 
+#define MAX_THREADS 12
 /* @} */
-
 
 /*!
  * \name THREAD_STACK_SIZE
@@ -178,16 +172,15 @@ typedef int ssize_t;
 #define MAX_SUBSCRIPTION_QUEUED_EVENTS 10
 /* @} */
 
-
 /*! \name MAX_SUBSCRIPTION_EVENT_AGE
  *
- *  The {\tt MAX_SUBSCRIPTION__EVENT_AGE} determines the maximum number of 
- *  seconds which an event can spend on a subscription queue (waiting for the 
- *  event at the head of the queue to be communicated). This parameter will 
- *  have no effect in most situations with the default (low) value of 
- *  MAX_SUBSCRIPTION_QUEUED_EVENTS. However, if MAX_SUBSCRIPTION_QUEUED_EVENTS 
- *  is set to a high value, the AGE parameter will allow pruning the queue in 
- *  good conformance with the UPnP Device Architecture standard, at the 
+ *  The {\tt MAX_SUBSCRIPTION__EVENT_AGE} determines the maximum number of
+ *  seconds which an event can spend on a subscription queue (waiting for the
+ *  event at the head of the queue to be communicated). This parameter will
+ *  have no effect in most situations with the default (low) value of
+ *  MAX_SUBSCRIPTION_QUEUED_EVENTS. However, if MAX_SUBSCRIPTION_QUEUED_EVENTS
+ *  is set to a high value, the AGE parameter will allow pruning the queue in
+ *  good conformance with the UPnP Device Architecture standard, at the
  *  price of higher potential memory use.
  *
  * @{
@@ -195,13 +188,12 @@ typedef int ssize_t;
 #define MAX_SUBSCRIPTION_EVENT_AGE 30
 /* @} */
 
-
 /*!
  * \name DEFAULT_SOAP_CONTENT_LENGTH
  *
- * SOAP messages will read at most {\tt DEFAULT_SOAP_CONTENT_LENGTH} bytes.  
- * This prevents devices that have a misbehaving web server to send 
- * a large amount of data to the control point causing it to crash.  
+ * SOAP messages will read at most {\tt DEFAULT_SOAP_CONTENT_LENGTH} bytes.
+ * This prevents devices that have a misbehaving web server to send
+ * a large amount of data to the control point causing it to crash.
  * This can be adjusted dynamically with {\tt UpnpSetMaxContentLength}.
  *
  * @{
@@ -209,24 +201,22 @@ typedef int ssize_t;
 #define DEFAULT_SOAP_CONTENT_LENGTH 16000
 /* @} */
 
-
 /*!
  * \name NUM_SSDP_COPY
  *
- * This configuration parameter determines how many copies of each SSDP 
- * advertisement and search packets will be sent. By default it will send two 
- * copies of every packet.  
+ * This configuration parameter determines how many copies of each SSDP
+ * advertisement and search packets will be sent. By default it will send two
+ * copies of every packet.
  *
  * @{
  */
 #define NUM_SSDP_COPY  2
 /* @} */
 
-
 /*!
  * \name SSDP_PAUSE
  *
- * This configuration parameter determines the pause between identical SSDP 
+ * This configuration parameter determines the pause between identical SSDP
  * advertisement and search packets. The pause is measured in milliseconds
  * and defaults to 100.
  *
@@ -237,8 +227,8 @@ typedef int ssize_t;
 
 /*!
  * \name WEB_SERVER_BUF_SIZE
- * 
- * This configuration parameter sets the maximum buffer size for the 
+ *
+ * This configuration parameter sets the maximum buffer size for the
  * webserver. The default value is 1MB.
  *
  * @{
@@ -264,9 +254,9 @@ typedef int ssize_t;
  * \name AUTO_RENEW_TIME
  *
  * The {\tt AUTO_RENEW_TIME} is the time, in seconds, before a subscription
- * expires that the SDK automatically resubscribes.  The default 
- * value is 10 seconds.  Setting this value too low can result in the 
- * subscription renewal not making it to the device in time, causing the 
+ * expires that the SDK automatically resubscribes.  The default
+ * value is 10 seconds.  Setting this value too low can result in the
+ * subscription renewal not making it to the device in time, causing the
  * subscription to timeout. In order to avoid continually resubscribing
  * the minimum subscription time is five seconds more than the auto renew
  * time.
@@ -281,7 +271,7 @@ typedef int ssize_t;
  *
  * The {\tt CP_MINIMUM_SUBSCRIPTION_TIME} is the minimum subscription time
  * allowed for a control point using the SDK. Subscribing for less than
- * this time automatically results in a subscription for this amount.  The 
+ * this time automatically results in a subscription for this amount.  The
  * default value is 5 seconds more than the {\tt AUTO_RENEW_TIME}, or 15
  * seconds.
  *
@@ -290,13 +280,12 @@ typedef int ssize_t;
 #define CP_MINIMUM_SUBSCRIPTION_TIME (AUTO_RENEW_TIME + 5)
 /* @} */
 
-
 /*!
  * \name MAX_SEARCH_TIME
  *
  * The {\tt MAX_SEARCH_TIME} is the maximum time
  * allowed for an SSDP search by a control point. Searching for greater than
- * this time automatically results in a search for this amount.  The default 
+ * this time automatically results in a search for this amount.  The default
  * value is 80 seconds.
  *
  * @{
@@ -304,20 +293,18 @@ typedef int ssize_t;
 #define MAX_SEARCH_TIME 80
 /* @} */
 
-
 /*!
  * \name MIN_SEARCH_TIME
  *
  * The {\tt MIN_SEARCH_TIME} is the minimumm time
  * allowed for an SSDP search by a control point. Searching for less than
- * this time automatically results in a search for this amount.  The default 
+ * this time automatically results in a search for this amount.  The default
  * value is 2 seconds.
  *
  * @{
  */
 #define MIN_SEARCH_TIME 2
 /* @} */
-
 
 /*!
  * \name AUTO_ADVERTISEMENT_TIME
@@ -331,7 +318,6 @@ typedef int ssize_t;
 #define AUTO_ADVERTISEMENT_TIME 30
 /* @} */
 
-
 /*!
  * \name SSDP_PACKET_DISTRIBUTE
  *
@@ -339,14 +325,13 @@ typedef int ssize_t;
  * at an interval equal to half of the expiration time of SSDP packets
  * minus the AUTO_ADVERTISEMENT_TIME. This is used to increase
  * the probability of SSDP packets reaching to control points.
- * It is recommended that this flag be turned on for embedded wireless 
+ * It is recommended that this flag be turned on for embedded wireless
  * devices.
  *
  * @{
  */
 #define SSDP_PACKET_DISTRIBUTE 1
 /* @} */
-
 
 /*!
  * \name GENA_NOTIFICATION_SENDING_TIMEOUT
@@ -391,12 +376,11 @@ typedef int ssize_t;
 #define GENA_NOTIFICATION_ANSWERING_TIMEOUT HTTP_DEFAULT_TIMEOUT
 /* @} */
 
-
 /*!
  * \name Module Exclusion
  *
- * Depending on the requirements, the user can selectively discard any of 
- * the major modules like SOAP, GENA, SSDP or the Internal web server. By 
+ * Depending on the requirements, the user can selectively discard any of
+ * the major modules like SOAP, GENA, SSDP or the Internal web server. By
  * default everything is included inside the SDK.  By setting any of
  * the values below to 0, that component will not be included in the final
  * SDK.
@@ -425,20 +409,18 @@ typedef int ssize_t;
 #endif
 /* @} */
 
-    
 /*!
  * \name DEBUG_TARGET
  *
- * The user has the option to redirect the library output debug messages 
- * to either the screen or to a log file.  All the output messages with 
- * debug level 0 will go to {\tt upnp.err} and messages with debug level 
+ * The user has the option to redirect the library output debug messages
+ * to either the screen or to a log file.  All the output messages with
+ * debug level 0 will go to {\tt upnp.err} and messages with debug level
  * greater than zero will be redirected to {\tt upnp.out}.
  *
  * @{
  */
-#define DEBUG_TARGET        1   
+#define DEBUG_TARGET 1
 /* @} */
-
 
 /*!
  * \name Other debugging features
@@ -462,20 +444,17 @@ typedef int ssize_t;
  * @} Compile time configuration options
  */
 
-
 /***************************************************************************
  * Do not change, Internal purpose only!!!
- ***************************************************************************/ 
+ ***************************************************************************/
 
 /*!
  * @{
  */
 
-
 /*
- * Set additional defines based on requested configuration 
+ * Set additional defines based on requested configuration
  */
-
 
 /* configure --enable-client */
 #if UPNP_HAVE_CLIENT

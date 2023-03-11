@@ -83,7 +83,7 @@
 
 #define APPLICATION_LISTENING_PORT 49152
 
-using MiniServerState = enum {
+enum MiniServerState {
     MSERV_IDLE,
     MSERV_RUNNING
 };

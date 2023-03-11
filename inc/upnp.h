@@ -303,17 +303,17 @@ enum UpnpOpenFileMode
 
 /** Client (Control Point) registration handle. Returned by @ref
  *  UpnpRegisterClient, and first parameter to further API calls. */
-typedef int  UpnpClient_Handle;
+using UpnpClient_Handle = int;
 
 /** Device registration handle. Returned by @ref UpnpRegisterRootDevice and
  * its variants, and first paramter to further API calls */
-typedef int  UpnpDevice_Handle;
+using UpnpDevice_Handle = int;
 
 /**
  * This value defines the reason for an event callback, and the kind
  * of data structure which the \b Event parameter points to.
  */
-typedef enum Upnp_EventType_e {
+enum Upnp_EventType {
     /*  Control callbacks */
 
     /** Received by a device when a control point issues a control
@@ -328,7 +328,6 @@ typedef enum Upnp_EventType_e {
 
     /** Not used. */
     UPNP_CONTROL_GET_VAR_COMPLETE,
-
 
     /* Discovery callbacks */
 
@@ -388,16 +387,14 @@ typedef enum Upnp_EventType_e {
      * The \b Event parameter is an @ref Upnp_Event_Subscribe
      * structure. The subscription is no longer valid. */
     UPNP_EVENT_SUBSCRIPTION_EXPIRED
-} Upnp_EventType;
-
-
+};
 
 /** @brief Holds a service subscription unique identifier. */
-typedef std::string Upnp_SID;
+using Upnp_SID = std::string;
 
 /** @brief Specifies the type of description passed to
  * @ref UpnpRegisterRootDevice2. */
-typedef enum Upnp_DescType_e {
+enum Upnp_DescType {
     /** @brief The description is the URL to the description document. */
     UPNPREG_URL_DESC,
 
@@ -408,10 +405,10 @@ typedef enum Upnp_DescType_e {
     /** @brief The description is a pointer to a character array containing
      *  the XML description document. */
     UPNPREG_BUF_DESC
-} Upnp_DescType;
+};
 
 /** Option values for the @ref UpnpInitWithOptions flags argument */
-typedef enum {
+enum Upnp_InitFlag {
     UPNP_FLAG_NONE = 0,
     /** Accept IPV4+IPV6 operation, run with IPV4 only if IPV6 not available */
     UPNP_FLAG_IPV6 = 0x1,
@@ -422,15 +419,15 @@ typedef enum {
     /** Reject Web requests with a host name (non-numeric) value in the HOST header,
      * instead of redirecting them. */
     UPNP_FLAG_REJECT_HOSTNAMES = 0x8,
-} Upnp_InitFlag;
+};
 
 /** Values for the @ref UpnpInitWithOptions vararg options list */
-typedef enum {
+enum Upnp_InitOption {
     /** @brief Terminate the VARARGs list. */
     UPNP_OPTION_END = 0,
     /** @brief Max wait seconds for an IP address to be found, int arg follows */
     UPNP_OPTION_NETWORK_WAIT,
-} Upnp_InitOption;
+};
 
 /** Used in the device callback API as parameter for
  * @ref UPNP_CONTROL_ACTION_REQUEST. This holds the action type and data
@@ -686,9 +683,8 @@ using UpnpFileInfo = File_Info;
  * the associated \b Event parameter.
  *
  */
-typedef int (*Upnp_FunPtr)(
-    Upnp_EventType EventType, const void *Event, void *Cookie);
-
+using Upnp_FunPtr = int (*)(
+    Upnp_EventType EventType, const void* Event, void* Cookie);
 
 /** \name Initialization, common to client and device interfaces.
  * @{
@@ -1856,7 +1852,7 @@ EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const sockaddr_storage*);
  *     \li \c UPNP_E_SUCCESS: a request with the HOST header set to hostname should be processed.
  *     \li \c UPNP_E_BAD_HTTPMSG the request should be redirected or rejected.
  */
-typedef int (*WebCallback_HostValidate)(const char *hostname, void *cookie);
+using WebCallback_HostValidate = int (*)(const char* hostname, void* cookie);
 
 EXPORT_SPEC int UpnpSetWebRequestHostValidateCallback(
     WebCallback_HostValidate callback, void *cookie);
@@ -1867,20 +1863,19 @@ EXPORT_SPEC int UpnpSetHostValidateCallback(
 
 
 /** Handle returned by the @ref VDCallback_Open virtual directory function. */
-typedef void *UpnpWebFileHandle;
+using UpnpWebFileHandle = void*;
 
 /** @brief Virtual Directory function prototype for the "get file
  *  information" callback. This is guaranteed to always be the first call in a
  *  sequence to access a virtual file, so the cookie will be
  *  accessible to other calls. */
-typedef int (*VDCallback_GetInfo)(
+using VDCallback_GetInfo = int (*)(
     /** [in] The name of the file to query. */
-    const char *filename,
+    const char* filename,
     /** [out] Pointer to a structure to store the information on the file. */
-    File_Info *info,
-    const void *cookie,
-    const void **request_cookiep
-    );
+    File_Info* info,
+    const void* cookie,
+    const void** request_cookiep);
 
 /**
  * @brief Sets the get_info callback function to be used to access a virtual
@@ -1893,15 +1888,14 @@ typedef int (*VDCallback_GetInfo)(
 EXPORT_SPEC int UpnpVirtualDir_set_GetInfoCallback(VDCallback_GetInfo callback);
 
 /** @brief Virtual Directory Open callback function prototype. */
-typedef UpnpWebFileHandle (*VDCallback_Open)(
+using VDCallback_Open = UpnpWebFileHandle (*)(
     /** [in] The name of the file to open. */
-    const char *filename,
+    const char* filename,
     /** [in] The mode in which to open the file.
      * Valid values are \c UPNP_READ or \c UPNP_WRITE. */
     UpnpOpenFileMode Mode,
-    const void *cookie,
-    const void *request_cookie
-    );
+    const void* cookie,
+    const void* request_cookie);
 
 /**
  * @brief Sets the open callback function to be used to access a virtual
@@ -1914,16 +1908,15 @@ typedef UpnpWebFileHandle (*VDCallback_Open)(
 EXPORT_SPEC int UpnpVirtualDir_set_OpenCallback(VDCallback_Open callback);
 
 /** @brief Virtual Directory Read callback function prototype. */
-typedef int (*VDCallback_Read)(
+using VDCallback_Read = int (*)(
     /** [in] The handle of the file to read. */
     UpnpWebFileHandle fileHnd,
     /** [out] The buffer in which to place the data. */
-    char *buf,
+    char* buf,
     /** [in] The size of the buffer (i.e. the number of bytes to read). */
     size_t buflen,
-    const void *cookie,
-    const void *request_cookie
-    );
+    const void* cookie,
+    const void* request_cookie);
 
 /**
  * @brief Sets the read callback function to be used to access a virtual
@@ -1936,16 +1929,15 @@ typedef int (*VDCallback_Read)(
 EXPORT_SPEC int UpnpVirtualDir_set_ReadCallback(VDCallback_Read callback);
 
 /** @brief Virtual Directory Write callback function prototype. */
-typedef    int (*VDCallback_Write)(
+using VDCallback_Write = int (*)(
     /** [in] The handle of the file to write. */
     UpnpWebFileHandle fileHnd,
     /** [in] The buffer with the bytes to write. */
-    char *buf,
+    char* buf,
     /** [in] The number of bytes to write. */
     size_t buflen,
-    const void *cookie,
-    const void *request_cookie
-    );
+    const void* cookie,
+    const void* request_cookie);
 
 /**
  * @brief Sets the write callback function to be used to access a virtual
@@ -1958,7 +1950,7 @@ typedef    int (*VDCallback_Write)(
 EXPORT_SPEC int UpnpVirtualDir_set_WriteCallback(VDCallback_Write callback);
 
 /** @brief Virtual Directory Seek callback function prototype. */
-typedef int (*VDCallback_Seek) (
+using VDCallback_Seek = int (*)(
     /** [in] The handle of the file to move the file pointer. */
     UpnpWebFileHandle fileHnd,
     /** [in] The number of bytes to move in the file.  Positive values
@@ -1970,9 +1962,8 @@ typedef int (*VDCallback_Seek) (
      * move relative to the end of the file, or \c SEEK_SET to
      * specify an absolute offset. */
     int origin,
-    const void *cookie,
-    const void *request_cookie
-    );
+    const void* cookie,
+    const void* request_cookie);
 
 /**
  * @brief Sets the seek callback function to be used to access a virtual
@@ -1985,12 +1976,11 @@ typedef int (*VDCallback_Seek) (
 EXPORT_SPEC int UpnpVirtualDir_set_SeekCallback(VDCallback_Seek callback);
 
 /** @brief Virtual directory close callback function prototype. */
-typedef int (*VDCallback_Close)(
+using VDCallback_Close = int (*)(
     /** [in] The handle of the file to close. */
     UpnpWebFileHandle fileHnd,
-    const void *cookie,
-    const void *request_cookie
-    );
+    const void* cookie,
+    const void* request_cookie);
 
 /**
  * @brief Sets the close callback function to be used to access a virtual

@@ -3,19 +3,19 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- * 
+ *
  *     (1) Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer. 
- * 
+ *     notice, this list of conditions and the following disclaimer.
+ *
  *     (2) Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in
  *     the documentation and/or other materials provided with the
- *     distribution.  
- *     
+ *     distribution.
+ *
  *     (3)The name of the author may not be used to
  *     endorse or promote products derived from this software without
  *     specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,17 +26,17 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.  
-**********************************************************/
+ * POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************/
 
 #ifndef _PICOXML_H_INCLUDED_
 #define _PICOXML_H_INCLUDED_
 
-/** 
+/**
  * PicoXMLParser: a single include file parser for an XML-like, but
  * restricted language, adequate for config files, not for arbitrary
  * externally generated data.
- * 
+ *
  *  - The code depends on nothing but the C++ standard library
  *  - The input to the parser is a single c++ string. Does not deal with
  *    input in several pieces or files.
@@ -64,7 +64,7 @@
 #include <algorithm>
 
 // Expat compat
-typedef char XML_Char;
+using XML_Char = char;
 
 class PicoXMLParser {
 public:
@@ -85,14 +85,14 @@ public:
     virtual std::string getReason() {
         return m_reason.str();
     }
-        
+
 protected:
 
     /* Methods to be overriden */
 
-    /** 
+    /**
      * Tag open handler.
-     * @param tagname the tag name 
+     * @param tagname the tag name
      * @param attrs a map of attribute name/value pairs
      */
     virtual void startElement(
@@ -102,7 +102,7 @@ protected:
     virtual void StartElement(const XML_Char *, const XML_Char **) {}
 
     /**
-     * Tag close handler. 
+     * Tag close handler.
      * You should probably have been accumulating text and stuff since
      * the tag opening.
      * @param tagname the tag name.
@@ -119,7 +119,7 @@ protected:
     /** Expatmm compat */
     virtual void CharacterData(const XML_Char *, int) {}
 
-    /** 
+    /**
      * Return current tag name stack. Deprecated, use m_path.
      * This does not include the current (bottom) tag.
      * Attributes are not kept in there, you'll have to do this yourself.
@@ -129,7 +129,7 @@ protected:
         return m_tagstack;
     }
 
-    /** 
+    /**
      * Current element stack, including the bottom one
      * Each entry includes the attributes and the starting character offset.
      * The stack includes the last element (the one open is called for).
@@ -185,11 +185,11 @@ private:
             // empty file
             return true;
         }
-        
+
         for (;;) {
             // Current char is '<' and the next char is not '?'
-            //std::cerr<< "m_pos "<< m_pos<<" char "<< m_in[m_pos]<<std::endl;
-            // skipComment also processes 
+            // std::cerr<< "m_pos "<< m_pos<<" char "<< m_in[m_pos]<<std::endl;
+            // skipComment also processes
             if (!skipComment()) {
                 return false;
             }
@@ -219,7 +219,7 @@ private:
                 m_reason << "Bad tag </xx/> at cpos " << spos;
                 return false;
             }
-                    
+
             std::string tag =
                 m_in.substr(spos + isendtag,
                             m_pos - (spos + 1 + isendtag + emptyel));
@@ -260,7 +260,7 @@ private:
         }
         return true;
     }
-    
+
     bool nomore(int sz = 0) const {
         return m_pos == std::string::npos || m_pos >= m_in.size() - sz;
     }
@@ -333,7 +333,7 @@ private:
         }
         return true;
     }
-    
+
     bool parseattrs(std::string& tag,
                     std::map<std::string, std::string>& attrs) {
         //std::cerr << "parseattrs: [" << tag << "]\n";
