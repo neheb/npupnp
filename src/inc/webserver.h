@@ -37,11 +37,10 @@
 #include <stdint.h>
 #include "httputils.h"
 
-
-typedef enum {
+enum WebServerState {
     WEB_SERVER_DISABLED,
     WEB_SERVER_ENABLED
-} WebServerState;
+};
 
 extern WebServerState bWebServerState;
 

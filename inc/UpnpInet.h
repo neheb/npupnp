@@ -11,9 +11,9 @@
 #include <ws2tcpip.h>
 
 #if(_WIN32_WINNT < 0x0600)
-typedef short sa_family_t;
+using sa_family_t = short;
 #else
-typedef ADDRESS_FAMILY sa_family_t;
+using sa_family_t = ADDRESS_FAMILY;
 #endif
 
 #define UpnpCloseSocket(s)  do {closesocket(s); s = INVALID_SOCKET;} while(0)
@@ -27,7 +27,7 @@ typedef ADDRESS_FAMILY sa_family_t;
 #define UpnpCloseSocket(s) do {close(s); s = -1;} while(0)
 #define UPNP_SOCK_GET_LAST_ERROR() errno
 /* SOCKET is typedefd by the system and unsigned on Win32 */
-typedef int SOCKET;
+using SOCKET = int;
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR (-1)
 /*** End Windows compat */

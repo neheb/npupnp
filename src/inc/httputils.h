@@ -44,7 +44,7 @@ struct uri_type;
 #define HTTP_DEFAULT_TIMEOUT    30
 
 /* method in a HTTP request. */
-typedef enum {
+enum http_method_t {
     HTTPMETHOD_POST,
     HTTPMETHOD_MPOST,
     HTTPMETHOD_SUBSCRIBE,
@@ -56,7 +56,7 @@ typedef enum {
     HTTPMETHOD_UNKNOWN,
     SOAPMETHOD_POST,
     HTTPMETHOD_SIMPLEGET
-} http_method_t;
+};
 
 /* Translate method name to numeric. Methname must be uppercase */
 http_method_t httpmethod_str2enum(const char *methname);

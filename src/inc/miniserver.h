@@ -78,7 +78,7 @@ private:
 };
 
 struct MHDTransaction;
-typedef void (*MiniServerCallback) (MHDTransaction*);
+using MiniServerCallback = void (*)(MHDTransaction*);
 
 /*!
  * \brief Set HTTP Get Callback.

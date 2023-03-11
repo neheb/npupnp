@@ -46,7 +46,7 @@ extern "C" {
 #endif
 
 /** Describe the code area generating the message */
-typedef enum Upnp_Module {
+enum Dbg_Module {
     /** SSDP (discovery) client and server. */
     SSDP,
     /** SOAP (actions) client and server. */
@@ -62,12 +62,12 @@ typedef enum Upnp_Module {
     API,
     /** WEB server. */
     HTTP
-} Dbg_Module;
+};
 
 /** @brief Log verbosity level, from UPNP_CRITICAL to UPNP_ALL, in
  * increasing order of verbosity.
  */
-typedef enum Upnp_LogLevel {
+enum Upnp_LogLevel {
     /** Fatal error, the library is probably not functional any more. */
     UPNP_CRITICAL,
     /** Regular operational, usually local error. */
@@ -78,7 +78,7 @@ typedef enum Upnp_LogLevel {
     UPNP_DEBUG,
     /** Very verbose debugging traces. */
     UPNP_ALL
-} Upnp_LogLevel;
+};
 
 /** Default log level */
 #define UPNP_DEFAULT_LOG_LEVEL  UPNP_ERROR
