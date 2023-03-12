@@ -86,6 +86,12 @@
 #include <io.h>
 #endif
 
+template <>
+std::string MedocUtils::stringsToString(const std::vector<std::string>& tokens);
+
+template <>
+bool MedocUtils::stringToStrings(const std::string& s, std::vector<std::string>& tokens, const std::string& addseps);
+
 // Default advertisement expiration time used if the exp parameter to UpnpSendAdvertisement() is <=0
 #define DEFAULT_MAXAGE 1800
 
