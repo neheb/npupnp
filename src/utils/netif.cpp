@@ -393,9 +393,9 @@ const std::string& Interface::gethwaddr() const
 std::string Interface::gethexhwaddr() const
 {
     char buf[20];
-    snprintf(buf, 20, "%02x:%02x:%02x:%02x:%02x:%02x",
-             m->hwaddr[0] & 0xFFU, m->hwaddr[1] & 0xFFU, m->hwaddr[2] & 0xFFU,
-             m->hwaddr[3] & 0xFFU, m->hwaddr[4] & 0xFFU, m->hwaddr[5] & 0xFFU);
+    snprintf(buf, 20, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
+             m->hwaddr[0], m->hwaddr[1], m->hwaddr[2],
+             m->hwaddr[3], m->hwaddr[4], m->hwaddr[5]);
     return buf;
 }
 
