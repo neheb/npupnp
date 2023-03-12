@@ -1892,7 +1892,7 @@ int UpnpDownloadUrlItem(const std::string& url,
 /* Get callback function ptr from a handle. */
 Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 {
-    return (static_cast<Handle_Info *>(HandleTable[Hnd]))->Callback;
+    return HandleTable[Hnd]->Callback;
 }
 
 /* Assumes at most one client */
@@ -1994,7 +1994,7 @@ Upnp_Handle_Type GetHandleInfo(UpnpClient_Handle Hnd,
         //           "GetHandleInfo: HTable[%d] is NULL\n",
         //           Hnd);
     } else if (HandleTable[Hnd] != nullptr) {
-        *HndInfo = static_cast<Handle_Info *>(HandleTable[Hnd]);
+        *HndInfo = HandleTable[Hnd];
         ret = (*HndInfo)->HType;
     }
 
@@ -2005,7 +2005,7 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
 {
     Handle_Info * HndInfo;
     if (HandleTable[Hnd] != nullptr) {
-        HndInfo = static_cast<Handle_Info*>(HandleTable[Hnd]);
+        HndInfo = HandleTable[Hnd];
         UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
                    "Handle_%d Type_%d: \n", Hnd, HndInfo->HType);
 #ifdef INCLUDE_DEVICE_APIS
@@ -2103,7 +2103,7 @@ int UpnpIsWebserverEnabled()
         return 0;
     }
 
-    return bWebServerState == static_cast<WebServerState>(WEB_SERVER_ENABLED);
+    return bWebServerState == WEB_SERVER_ENABLED;
 }
 
 int UpnpSetVirtualDirCallbacks(UpnpVirtualDirCallbacks *callbacks)
