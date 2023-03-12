@@ -1896,7 +1896,7 @@ int UpnpDownloadUrlItem(const std::string& url,
 }
 
 /* Get callback function ptr from a handle. */
-Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
+[[maybe_unused]] static Upnp_FunPtr GetCallBackFn(UpnpClient_Handle Hnd)
 {
     return HandleTable[Hnd]->Callback;
 }
@@ -2220,7 +2220,7 @@ int UpnpSetMaxContentLength(size_t contentLength)
     return UPNP_E_SUCCESS;
 }
 
-int UpnpSetEventQueueLimits(int maxLen, int maxAge)
+[[maybe_unused]] static int UpnpSetEventQueueLimits(int maxLen, int maxAge)
 {
     g_UpnpSdkEQMaxLen = maxLen;
     g_UpnpSdkEQMaxAge = maxAge;
