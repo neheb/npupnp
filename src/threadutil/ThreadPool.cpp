@@ -483,8 +483,7 @@ int ThreadPool::Internal::createWorker(std::unique_lock<std::mutex>& lck)
         this->start_and_shutdown.wait(lck);
     }
 
-    if (this->attr.maxThreads != ThreadPoolAttr::INFINITE_THREADS &&
-        this->totalThreads + 1 > this->attr.maxThreads) {
+    if (this->attr.maxThreads != ThreadPoolAttr::INFINITE_THREADS && this->totalThreads >= this->attr.maxThreads - 1) {
         LOGDEB("ThreadPool::createWorker: not creating thread: too many\n");
         return EMAXTHREADS;
     }
