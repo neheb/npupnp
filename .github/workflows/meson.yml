@@ -13,25 +13,100 @@ jobs:
     strategy:
       matrix:
         cxx: ['7', '8', '9', '10']
-        deps: ['forcefallback', 'default']
+        deps: ['disabled', 'enabled']
         type: ['shared', 'static']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install packages
         run: |
           sudo apt update
-          sudo apt install -y g++-${{matrix.cxx}} libcurl4-gnutls-dev libmicrohttpd-dev
+          sudo apt install -y g++-${{matrix.cxx}}
           python3 -m pip install meson ninja
 
       - name: Compile and Test
         env:
           CXX: g++-${{matrix.cxx}}
         run: |
-          meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
+          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
           meson compile -C "${{github.workspace}}/build" --verbose
           meson test -C "${{github.workspace}}/build" --verbose
 
+  Ubuntu-clang:
+    runs-on: ubuntu-20.04
+    name: Linux-Clang${{matrix.cxx}}-${{matrix.deps}}-${{matrix.type}}
+    strategy:
+      matrix:
+        cxx: ['7', '8', '9', '10', '11', '12']
+        deps: ['disabled', 'enabled']
+        type: ['shared', 'static']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          sudo apt update
+          sudo apt install -y clang++-${{matrix.cxx}} libc++abi-${{matrix.cxx}}-dev libc++-${{matrix.cxx}}-dev lld-${{matrix.cxx}}
+          python3 -m pip install meson ninja
+
+      - name: Compile and Test
+        env:
+          CC: clang-${{matrix.cxx}}
+          CXX: clang++-${{matrix.cxx}}
+          CXX_LD: lld-${{matrix.cxx}}
+        run: |
+          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+
+  VisualStudio:
+    runs-on: windows-latest
+    name: MSVC-${{matrix.deps}}-${{matrix.platform}}
+    strategy:
+      matrix:
+        deps: ['disabled', 'enabled']
+        deps: ['forcefallback', 'default']
+        platform: ['x64', 'x86']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          python -m pip install meson ninja
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{matrix.platform}}
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Dwarning_level=3 -Dcpp_std=c++latest
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  VisualStudio-clang-cl:
+    runs-on: windows-latest
+    name: clang-cl-${{matrix.deps}}
+    strategy:
+      matrix:
+        deps: ['disabled', 'enabled']
+        deps: ['forcefallback', 'default']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          python -m pip install meson ninja
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile and Test
+        env:
+          CC: clang-cl
+          CXX: clang-cl
+        run: |
+          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Dwarning_level=3 -Dcpp_std=c++latest
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
   MacOS:
     runs-on: macos-latest
     name: macOS-${{matrix.deps}}-${{matrix.type}}
@@ -40,12 +115,11 @@ jobs:
         deps: ['forcefallback', 'default']
         type: ['shared', 'static']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install packages
         run: |
           python3 -m pip install meson ninja
-          brew install libmicrohttpd
 
       - name: Compile and Test
         run: |
