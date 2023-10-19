@@ -29,6 +29,7 @@ else
   add_project_arguments('-DUPNP_STATIC_LIB', language: 'cpp')
 endif
 
+add_project_arguments('-DNOMINMAX', language: 'cpp')
 add_project_arguments('-DSMALLUT_NO_REGEX', language: 'cpp')
 add_project_arguments('-DSMALLUT_EXTERNAL_INSTANTIATIONS', language: 'cpp')
 
