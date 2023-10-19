@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         cxx: ['7', '8', '9', '10']
-        deps: ['disabled', 'enabled']
+        deps: ['forcefallback', 'default']
         type: ['shared', 'static']
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +28,7 @@ jobs:
         env:
           CXX: g++-${{matrix.cxx}}
         run: |
-          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
+          meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
           meson compile -C "${{github.workspace}}/build" --verbose
           meson test -C "${{github.workspace}}/build" --verbose
 
@@ -38,7 +38,7 @@ jobs:
     strategy:
       matrix:
         cxx: ['7', '8', '9', '10', '11', '12']
-        deps: ['disabled', 'enabled']
+        deps: ['forcefallback', 'default']
         type: ['shared', 'static']
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
           CXX: clang++-${{matrix.cxx}}
           CXX_LD: lld-${{matrix.cxx}}
         run: |
-          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
+          meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Ddefault_library=${{matrix.type}} -Dwarning_level=3
           meson compile -C "${{github.workspace}}/build" --verbose
           meson test -C "${{github.workspace}}/build" --verbose
 
@@ -64,7 +64,6 @@ jobs:
     name: MSVC-${{matrix.deps}}-${{matrix.platform}}
     strategy:
       matrix:
-        deps: ['disabled', 'enabled']
         deps: ['forcefallback', 'default']
         platform: ['x64', 'x86']
     steps:
@@ -80,7 +79,7 @@ jobs:
 
       - name: Compile and Test
         run: |
-          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Dwarning_level=3 -Dcpp_std=c++latest
+          meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Dwarning_level=3 -Dcpp_std=c++latest
           meson compile -C "${{github.workspace}}/build" --verbose
           meson test -C "${{github.workspace}}/build" --verbose
   VisualStudio-clang-cl:
@@ -88,7 +87,6 @@ jobs:
     name: clang-cl-${{matrix.deps}}
     strategy:
       matrix:
-        deps: ['disabled', 'enabled']
         deps: ['forcefallback', 'default']
     steps:
       - uses: actions/checkout@v4
@@ -104,7 +102,7 @@ jobs:
           CC: clang-cl
           CXX: clang-cl
         run: |
-          meson setup "${{github.workspace}}/build" -Dauto_features=${{matrix.deps}} -Dwarning_level=3 -Dcpp_std=c++latest
+          meson setup "${{github.workspace}}/build" --wrap-mode=${{matrix.deps}} -Dwarning_level=3 -Dcpp_std=c++latest
           meson compile -C "${{github.workspace}}/build" --verbose
           meson test -C "${{github.workspace}}/build" --verbose
   MacOS:
