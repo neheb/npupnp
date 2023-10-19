@@ -117,7 +117,7 @@ libnpupnp = library(
   gnu_symbol_visibility: 'hidden',
   name_prefix: '',
   version: meson.project_version(),
-  soversion: host_machine.system() == 'windows' ? '' : [],
+  soversion: host_machine.system() == 'windows' ? '' : '5',
   include_directories: libnpupnp_incdir,
   dependencies: deps,
   install: true,
