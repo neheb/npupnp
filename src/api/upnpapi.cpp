@@ -1516,8 +1516,8 @@ int UpnpSearchAsyncUnicast(
     UpnpClient_Handle hnd, const std::string& url, const char *target, void *cookie)
 {
     uri_type parseduri;
-    int ret;
-    if ((ret = parse_uri(url, &parseduri)) != UPNP_E_SUCCESS) {
+    int ret = parse_uri(url, &parseduri);
+    if (ret != UPNP_E_SUCCESS) {
         return ret;
     }
     const char *host = parseduri.hostport.strhost.c_str();

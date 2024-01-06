@@ -620,7 +620,7 @@ static int create_url_list(
         return UPNP_E_INVALID_INTERFACE;
     }
 
-    std::string::size_type openpos = 0;
+    std::string::size_type openpos;
     std::string::size_type closepos = 0;
     for (;;) {
         if ((openpos = ulist.find('<', closepos)) == std::string::npos) {
