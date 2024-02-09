@@ -555,7 +555,7 @@ static int respond_ok(MHDTransaction *mhdt, int time_out, subscription *sub,
 // one of our supported addresses, not necessarily the one this
 // particular client connected to.
 static bool callStrangerCheck(
-    const std::string& surl, uri_type& temp, const NetIF::Interface *clnetif, NetIF::IPAddr& claddr)
+    const std::string& surl, uri_type& temp, const NetIF::Interface *clnetif, const NetIF::IPAddr& claddr)
 {
     NetIF::IPAddr subsaddr(reinterpret_cast<struct sockaddr*>(&temp.hostport.IPaddress));
     if (!subsaddr.ok()) {

@@ -329,7 +329,7 @@ static int getIfInfo(const char *IfNames)
 static int getmyipv4(const char *inipv4 = nullptr)
 {
     bool ipspecified = (nullptr != inipv4 && 0 != inipv4[0]);
-    NetIF::Interfaces *ifs = NetIF::Interfaces::theInterfaces();
+    const NetIF::Interfaces *ifs = NetIF::Interfaces::theInterfaces();
     NetIF::Interface *netifp{nullptr};
     NetIF::Interfaces::Filter filt;
     filt.needs = {NetIF::Interface::Flags::HASIPV4,
