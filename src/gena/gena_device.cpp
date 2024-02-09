@@ -127,10 +127,9 @@ static int GeneratePropertySet(
  */
 static int genaNotify(const std::string& propertySet, const subscription *sub)
 {
-    std::string mid_msg;
     int return_code = -1;
-
     long http_code = 0;
+
     /* send a notify to each url until one goes thru */
     for (const auto& url : sub->DeliveryURLs) {
         CURL *easy = curl_easy_init();
@@ -813,7 +812,6 @@ void gena_process_subscription_renewal_request(MHDTransaction *mhdt)
     service_info *service;
     struct Handle_Info *handle_info;
     UpnpDevice_Handle device_handle;
-    std::string event_url_path;
 
     /* if a CALLBACK or NT header is present, then it is an error */
     if (mhdt->headers.find("callback") != mhdt->headers.end() ||
