@@ -73,7 +73,7 @@ struct SSDPPwrState {
 struct SSDPCommonData {
     SOCKET sock;
     struct sockaddr_storage *DestAddr;
-    const char *DevOrServType;
+    const char *DevOrServType{};
     SSDPPwrState pwr;
     std::string prodvers;
 };
