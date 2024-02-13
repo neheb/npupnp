@@ -1513,7 +1513,7 @@ int UpnpSearchAsyncUnicast(
         return ret;
     }
     const char *host = parseduri.hostport.strhost.c_str();
-    int port = parseduri.hostport.strport.empty() ? 80 : atoi(parseduri.hostport.strport.c_str());
+    int port = parseduri.hostport.strport.empty() ? 80 : std::stoi(parseduri.hostport.strport);
     return searchAsyncUniMulti(hnd, 0, target, host, port, cookie);
 }
 

@@ -439,7 +439,7 @@ bool stringToBool(const std::string& s)
         return false;
     }
     if (isdigit(s[0])) {
-        int val = atoi(s.c_str());
+        int val = std::stoi(s);
         return val != 0;
     }
     return s.find_first_of("yYtT") == 0;
@@ -1116,12 +1116,12 @@ bool parseHTTPRanges(const std::string& ranges, std::vector<std::pair<int64_t, i
         std::string::size_type comma = ranges.find(',', pos);
         std::string firstPart = ranges.substr(pos, dash-pos);
         trimstring(firstPart);
-        int64_t start = firstPart.empty() ? -1 : atoll(firstPart.c_str());
+        int64_t start = firstPart.empty() ? -1 : std::stoi(firstPart);
         std::string secondPart = ranges.substr(
             dash+1, comma != std::string::npos ?
             comma-dash-1 : std::string::npos);
         trimstring(secondPart);
-        int64_t fin = secondPart.empty() ? -1 : atoll(secondPart.c_str());
+        int64_t fin = secondPart.empty() ? -1 : std::stoi(secondPart);
         if (start == -1 && fin == -1) {
             return false;
         }

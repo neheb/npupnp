@@ -255,7 +255,7 @@ int http_Download(const char *_surl, int timeout_secs,
 
     auto it = http_headers.find("content-length");
     if (it != http_headers.end()) {
-        uint64_t sizefromheaders = atoll(it->second.c_str());
+        uint64_t sizefromheaders = std::stoi(it->second);
         if (sizefromheaders != data.size()) {
             UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
                        "Response content-length %" PRIu64

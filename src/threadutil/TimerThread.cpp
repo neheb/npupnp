@@ -34,7 +34,6 @@
 #include "TimerThread.h"
 
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 #include <condition_variable>
 #include <list>
@@ -74,7 +73,7 @@ public:
 
 class TimerThread::Internal {
 public:
-    explicit Internal(ThreadPool *tp);
+    [[gnu::nonnull]] explicit Internal(ThreadPool *tp);
     virtual ~Internal() = default;
     std::mutex mutex;
     std::condition_variable condition;
@@ -92,7 +91,6 @@ public:
 void TimerJobWorker::work()
 {
     auto timer = m_parent;
-    assert(timer != nullptr);
     std::unique_lock<std::mutex> lck(timer->mutex);
 
     while (true) {
@@ -135,11 +133,8 @@ TimerThread::Internal::Internal(ThreadPool *tp)
 
 TimerThread::TimerThread(ThreadPool *tp)
 {
-    assert(tp != nullptr);
-    if (nullptr == tp) {
-        return;
-    }
-    m = std::make_unique<Internal>(tp);
+    if (tp)
+        m = std::make_unique<Internal>(tp);
 }
 
 TimerThread::~TimerThread() = default;

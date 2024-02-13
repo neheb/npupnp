@@ -75,7 +75,7 @@ protected:
         trimstring(m_chardata, " \t\n\r");
         if (parentname == "UPnPError") {
             if (!strcmp(name, "errorCode")) {
-                *errcodep = atoi(m_chardata.c_str());
+                *errcodep = std::stoi(m_chardata);
             } else if (!strcmp(name, "errorDescription")) {
                 errdesc = m_chardata;
             }

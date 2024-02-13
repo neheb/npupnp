@@ -43,12 +43,6 @@
 
 #include "webserver.h"
 
-#include <map>
-#include <unordered_map>
-#include <mutex>
-
-#include <cinttypes>
-
 #include "genut.h"
 #include "ssdplib.h"
 #include "statcodes.h"
@@ -56,6 +50,11 @@
 #include "uri.h"
 
 #include <cassert>
+#include <cinttypes>
+#include <map>
+#include <mutex>
+#include <unordered_map>
+
 #include <fcntl.h>
 #include <sys/stat.h>
 
