@@ -429,13 +429,13 @@ static int process_request(
     auto it = mhdt->headers.find("range");
     if (it != mhdt->headers.end()) {
         if (parseHTTPRanges(it->second, ranges) && !ranges.empty()) {
-            if (ranges.size() > 1 || ranges[0].first == -1) {
+            if (ranges.size() > 1 || ranges.front().first == -1) {
                 return HTTP_REQUEST_RANGE_NOT_SATISFIABLE;
             }
 
-            RespInstr->offset = ranges[0].first;
-            if (ranges[0].second >= 0) {
-                RespInstr->ReadSendSize = ranges[0].second - ranges[0].first + 1;
+            RespInstr->offset = ranges.front().first;
+            if (ranges.front().second >= 0) {
+                RespInstr->ReadSendSize = ranges.front().second - ranges.front().first + 1;
                 if (RespInstr->ReadSendSize < 0) {
                     RespInstr->ReadSendSize = 0;
                 }
@@ -462,7 +462,7 @@ static int process_request(
     if (request_doc.empty()) {
         return HTTP_FORBIDDEN;
     }
-    if (request_doc[0] != '/') {
+    if (request_doc.front() != '/') {
         /* no slash */
         return HTTP_BAD_REQUEST;
     }

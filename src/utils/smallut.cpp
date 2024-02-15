@@ -438,7 +438,7 @@ bool stringToBool(const std::string& s)
     if (s.empty()) {
         return false;
     }
-    if (isdigit(s[0])) {
+    if (isdigit(s.front())) {
         int val = std::stoi(s);
         return val != 0;
     }

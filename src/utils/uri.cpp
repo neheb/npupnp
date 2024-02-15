@@ -204,21 +204,21 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
 }
 
 /*!
- * \brief parses a uri scheme starting at in[0] as defined in 
+ * \brief parses a uri scheme starting at in.front() as defined in
  * http://www.ietf.org/rfc/rfc2396.txt (RFC explaining URIs).
  *
  * (e.g. "http:" -> scheme= "http").
  *
  * \note String MUST include ':' within the max charcters.
  *
- * \return 
+ * \return
  */
 static size_t parse_scheme(const std::string& in, std::string& out)
 {
     out.clear();
 
     // A scheme begins with an alphabetic character
-    if (in.empty() || !isalpha(in[0]))
+    if (in.empty() || !isalpha(in.front()))
         return 0;
 
     // Need a colon
@@ -287,7 +287,7 @@ std::string remove_dots(const std::string& in)
     if (in.empty()) {
         return in;
     }
-    bool isabs = in[0] == '/';
+    bool isabs = in.front() == '/';
     bool endslash = in.back() == '/';
     std::string::size_type pos = 0;
     while (pos != std::string::npos) {
@@ -372,7 +372,7 @@ std::string resolve_rel_url(
             url.query = base.query;
         }
     } else {
-        if (rel.path[0] == '/') {
+        if (rel.path.front() == '/') {
             url.path = rel.path;
         } else {
             // Merge paths
@@ -442,7 +442,7 @@ int parse_uri(const std::string& in, uri_type *out)
         }
     }
 
-    if (!out->path.empty() && out->path[0] == '/') {
+    if (!out->path.empty() && out->path.front() == '/') {
         out->path_type = ABS_PATH;
     }
 
