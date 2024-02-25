@@ -1052,9 +1052,7 @@ std::string valToString(const std::vector<CharFlags>& flags, unsigned int val)
         if (flag.value == val)
             return flag.yesname;
 
-    char mybuf[100];
-    sprintf(mybuf, "Unknown Value 0x%x", val);
-    return mybuf;
+    return "Unknown Value 0x" + std::to_string(val);
 }
 
 // Decode %-encoded string. We leave along anything which does not look like %xy where x,y are
