@@ -22,12 +22,12 @@
 #define _POSIX_C_SOURCE 200809L
 #endif
 
+#include <cstdint>
+#include <ctime>
 #include <functional>
 #include <map>
 #include <memory>
-#include <stdint.h>
 #include <string>
-#include <time.h>
 #include <vector>
 
 struct tm;
@@ -86,7 +86,7 @@ extern std::string stringtolower(const std::string& io);
 extern void stringtoupper(std::string& io);
 extern std::string stringtoupper(const std::string& io);
 extern bool beginswith(const std::string& b, const std::string& sml);
-extern bool endswith(const std::string& big, const std::string& small);
+extern bool endswith(const std::string& b, const std::string& sml);
 
 /** Note for all templated functions:
  * By default, smallut.cpp has explicit instantiations for common
