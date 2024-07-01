@@ -100,16 +100,16 @@ bool wchartoutf8(const wchar_t *in, std::string& out, int wlen)
         fwprintf(stderr, L"wchartoutf8: conversion error1 for [%s]\n", in);
         return false;
     }
-    DirtySmartBuf buffer(bytes+1);
-    bytes = ::WideCharToMultiByte(CP_UTF8, flags, in, wlen, buffer.buf(), bytes, nullptr, nullptr);
+    auto buffer = std::make_unique<char[]>(bytes + 1);
+    bytes = ::WideCharToMultiByte(CP_UTF8, flags, in, wlen, buffer.get(), bytes, nullptr, nullptr);
     if (bytes <= 0) {
 #ifdef LOGERR
         LOGERR("wchartoutf8: CONVERSION ERROR2\n");
 #endif
         return false;
     }
-    buffer.buf()[bytes] = 0;
-    out = buffer.buf();
+    buffer[bytes] = 0;
+    out = buffer.get();
     //fwprintf(stderr, L"wchartoutf8: in: [%s]\n", in);
     //fprintf(stderr, "wchartoutf8: out:  [%s]\n", out.c_str());
     return true;

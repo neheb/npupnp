@@ -1227,12 +1227,12 @@ static int readFile(const char *path, std::string& outstr, time_t *modtime)
     }
     *modtime = st.st_mtime;
     {
-        DirtySmartBuf buffer(st.st_size);
-        if (read(fd, buffer.buf(), st.st_size) != static_cast<ssize_t>(st.st_size)) {
+        auto buffer = std::make_unique<char[]>(st.st_size);
+        if (read(fd, buffer.get(), st.st_size) != static_cast<ssize_t>(st.st_size)) {
             ret = UPNP_E_FILE_READ_ERROR;
             goto out;
         }
-        outstr = std::string(buffer.buf(), st.st_size);
+        outstr = std::string(buffer.get(), st.st_size);
     }
 out:
     if (fd >= 0)
