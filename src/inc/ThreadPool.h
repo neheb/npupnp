@@ -35,6 +35,7 @@
 #define THREADPOOL_H
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 
 #ifdef __MINGW32__
