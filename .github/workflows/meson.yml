@@ -201,7 +201,7 @@ jobs:
             meson compile -C "${{github.workspace}}/build" --verbose
             meson test -C "${{github.workspace}}/build" --verbose
   Alpine:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         platform: ['x86_64', 'x86', 'armhf', 'armv7', 'aarch64', 'ppc64le', 'riscv64', 's390x']
@@ -212,7 +212,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jirutka/setup-alpine@v1
         with:
-          branch: edge
           arch: ${{matrix.platform}}
           packages: >
             build-base curl-dev expat-dev libmicrohttpd-dev linux-headers pkgconf meson samurai
