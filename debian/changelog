@@ -1,3 +1,9 @@
+libnpupnp (6.2.1-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
+
+  * Fix missing include breaking build with some compilers.
+  
+ -- Jean-Francois Dockes <jf@dockes.org>  Fri, 07 Mar 2025 08:02:00 +0100
+
 libnpupnp (6.2.0-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
 
   * Improved multi-interface search: send M-SEARCH on all configured

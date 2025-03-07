@@ -2,7 +2,7 @@ project(
   'libnpupnp',
   'cpp',
   license: 'BSD-3-Clause',
-  version: '6.2.0',
+  version: '6.2.1',
   default_options: 'cpp_std=c++17',
   meson_version: '>=0.49',
 )
@@ -14,7 +14,7 @@ npupnp_soversion = '13'
 # To keep consistent with autoconf:
 #  Interface added (backward compat): increment first number, set last to 0
 #  Release with only internal changes: increment last number
-npupnp_soversion_minor = '.3.0'
+npupnp_soversion_minor = '.3.1'
 
 cpp = meson.get_compiler('cpp')
 deps = []
