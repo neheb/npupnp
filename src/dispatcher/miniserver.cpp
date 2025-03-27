@@ -565,21 +565,16 @@ void MiniServerJobWorker::work()
 /*!
  * \brief Returns port to which socket, sockfd, is bound.
  *
- * \return -1 on error; check errno. 0 if successfull.
+ * \return -1 on error; check errno. 0 if successful.
  */
-static int get_port(
-    /*! [in] Socket descriptor. */
-    SOCKET sockfd,
-    /*! [out] The port value if successful, otherwise, untouched. */
-    uint16_t *port)
+static int get_port(SOCKET sockfd, uint16_t *port)
 {
     struct sockaddr_storage sockinfo;
     socklen_t len;
     int code;
 
     len = sizeof(sockinfo);
-    code = getsockname(
-        sockfd, reinterpret_cast<struct sockaddr *>(&sockinfo), &len);
+    code = getsockname(sockfd, reinterpret_cast<struct sockaddr *>(&sockinfo), &len);
     if (code == -1) {
         return -1;
     }
@@ -588,8 +583,8 @@ static int get_port(
     } else if(sockinfo.ss_family == AF_INET6) {
         *port = ntohs(reinterpret_cast<struct sockaddr_in6*>(&sockinfo)->sin6_port);
     }
-    UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
-               "sockfd = %d, .... port = %d\n", static_cast<int>(sockfd), static_cast<int>(*port));
+    UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__, "get_port: sockfd = %d, .... port = %d\n",
+               static_cast<int>(sockfd), static_cast<unsigned int>(*port));
 
     return 0;
 }
@@ -622,22 +617,19 @@ static int get_miniserver_stopsock(MiniServerSockArray *out)
     stop_sockaddr.sin_family = static_cast<sa_family_t>(AF_INET);
 
     if (inet_pton(AF_INET, "127.0.0.1", &stop_sockaddr.sin_addr) != 1) {
-        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
-                   "Error in converting IP address\n");
+        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__, "Error in converting IP address\n");
         return UPNP_E_INVALID_PARAM;
     }
     ret = bind(out->miniServerStopSock,
                reinterpret_cast<struct sockaddr *>(&stop_sockaddr),
                sizeof(stop_sockaddr));
     if (ret == SOCKET_ERROR) {
-        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
-                   "Error in binding localhost!!!\n");
+        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__, "Error in binding localhost!!!\n");
         return UPNP_E_SOCKET_BIND;
     }
     ret = get_port(out->miniServerStopSock, &out->stopPort);
     if (ret < 0) {
-        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
-                   "get_port failed for stop socket\n");
+        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__, "get_port failed for stop socket\n");
         return UPNP_E_INTERNAL_ERROR;
     }
     return UPNP_E_SUCCESS;
@@ -669,15 +661,17 @@ static int available_port(int reqport)
     ip->sin_family = AF_INET;
     ip->sin_addr.s_addr = htonl(INADDR_ANY);
     for (int i = 0; i < 20; i++) {
+        bool eaddrinuse{false};
+        int lastError;
+        std::string errorDesc;
         ip->sin_port = htons(static_cast<uint16_t>(port));
         if (bind(sock, reinterpret_cast<struct sockaddr*>(&saddr),
                  sizeof(struct sockaddr_in)) == 0) {
             ret = port;
             break;
         }
-        bool eaddrinuse{false};
-        int lastError;
-        std::string errorDesc;
+        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
+                   "available_port(): bind() failed errno %d\n", errno);
         NetIF::getLastError(errorDesc, &lastError);
 #if defined(_WIN32)
         eaddrinuse = (lastError == WSAEADDRINUSE || lastError == WSAEACCES);
@@ -689,7 +683,7 @@ static int available_port(int reqport)
             continue;
         }
         UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
-                   "miniserver: bind(): %s\n", errorDesc.c_str());
+                   "available_port(): bind(): %s\n", errorDesc.c_str());
         ret = UPNP_E_SOCKET_BIND;
         break;
     }
@@ -723,12 +717,15 @@ std::vector<SOCKET>& miniServerGetReqSocks4()
         return nosockets;
     return miniSocket->ssdpReqSock4List;
 }
+
+#ifdef UPNP_ENABLE_IPV6
 std::vector<SOCKET>& miniServerGetReqSocks6()
 {
     if (nullptr == miniSocket)
         return nosockets;
     return miniSocket->ssdpReqSock6List;
 }
+#endif
 
 /* @param[input,output] listen_port4/6 listening ports for incoming HTTP. */
 int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
@@ -810,9 +807,9 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
         mhdflags, port,
         filter_connections, nullptr, /* Accept policy callback and arg */
         &answer_to_connection, nullptr, /* Request handler and arg */
+        MHD_OPTION_EXTERNAL_LOGGER, mhdlogger, nullptr, 
         MHD_OPTION_NOTIFY_COMPLETED, request_completed_cb, nullptr,
         MHD_OPTION_CONNECTION_TIMEOUT, static_cast<unsigned int>(HTTP_DEFAULT_TIMEOUT),
-        MHD_OPTION_EXTERNAL_LOGGER, mhdlogger, nullptr, 
         MHD_OPTION_END);
     if (nullptr == mhd) {
         UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,

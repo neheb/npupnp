@@ -836,10 +836,12 @@ EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const struct sockaddr_storag
     case NetIF::IPAddr::Family::IPV4:
         port = UpnpGetServerPort();
         break;
+#ifdef UPNP_ENABLE_IPV6
     case NetIF::IPAddr::Family::IPV6:
         prefix = "[";
         port = UpnpGetServerPort6();
             break;
+#endif
     default:
         return {};
     }

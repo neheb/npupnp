@@ -471,15 +471,21 @@ int SearchByTarget(int Mx, const char *St, const char *saddress, int port, void 
     if (requestType == SSDP_SERROR)
         return UPNP_E_INVALID_PARAM;
 
-    bool needv4{true}, needv6{true};
-    const char *saddress4, *saddress6;
+    bool needv4{true};
+    const char *saddress4;
+#ifdef UPNP_ENABLE_IPV6
+    needv6{true};
+    const char *saddress6;
+#endif
     if (Mx == 0) {
         // Unicast request
         needv4 = nullptr != strchr(saddress, '.');
-        needv6 = !needv4;
         // Only one will be used, init both, simpler
         saddress4 = saddress;
+#ifdef UPNP_ENABLE_IPV6
+        needv6 = !needv4;
         saddress6 = saddress;
+#endif
     } else {
         if (Mx < UPNP_MIN_SEARCH_TIME)
             Mx = UPNP_MIN_SEARCH_TIME;
@@ -487,7 +493,9 @@ int SearchByTarget(int Mx, const char *St, const char *saddress, int port, void 
             Mx = UPNP_MAX_SEARCH_TIME;
         port = SSDP_PORT;
         saddress4 = SSDP_IP;
+#ifdef UPNP_ENABLE_IPV6
         saddress6 = SSDP_IPV6_LINKLOCAL;
+#endif
     }
 
     std::string ReqBufv4;
