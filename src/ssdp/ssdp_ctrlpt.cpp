@@ -474,7 +474,7 @@ int SearchByTarget(int Mx, const char *St, const char *saddress, int port, void 
     bool needv4{true};
     const char *saddress4;
 #ifdef UPNP_ENABLE_IPV6
-    needv6{true};
+    bool needv6{true};
     const char *saddress6;
 #endif
     if (Mx == 0) {
