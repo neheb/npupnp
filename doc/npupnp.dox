@@ -233,14 +233,14 @@ device name.
 #include <set>
 #include <mutex>
 #include <condition_variable>
-
-#include <libupnpp/control/description.hxx>
-
-#include <upnp/upnp.h>
-#include <upnp/upnpdebug.h>
-#include <upnp/upnptools.h>
-
 #include <iostream>
+
+#include <upnp.h>
+#include <upnpdebug.h>
+#include <upnptools.h>
+#include <upnpdescription.h>
+#include <netif.h>
+
 
 static int clctxt;
 
@@ -319,7 +319,7 @@ int main(int argc, char **argv)
                 continue;
             }
 
-            UPnPClient::UPnPDeviceDesc desc(*it, data);
+            UPnPDeviceDesc desc(*it, data);
             if (!desc.ok) {
                 std::cout << "Description parse failed for " << *it << "\n";
             } else {

@@ -32,19 +32,11 @@ page](https://www.lesbonscomptes.com/upmpdcli/pages/downloads.html)
 Build dependancies (as Debian package names, you may need to translate): `pkg-config`,
 `libexpat1-dev`, `libmicrohttpd-dev`, `libcurl4-gnutls-dev`.
 
-At the moment, the tar archives builds are based on the GNU autotools. The build sequence is the
-usual one:
-
-    [cd /path/to/top/of/extracted/tar]
-    configure --prefix=/usr
-    make
-    sudo make install
-
-The development code has switched to using meson/ninja-build. The new way is something like:
+The build uses meson/ninja. Something like:
 
     cd [somewhere]
-    meson setup --prefix=usr builddir /path/to/npupnp/meson.build
+    meson setup -Dprefix=usr builddir /path/to/npupnp
     cd builddir
     ninja 
-    sudo meson install
+    sudo ninja install
     
