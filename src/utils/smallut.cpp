@@ -1227,26 +1227,25 @@ std::string pc_decode(const std::string &in)
         return in;
     std::string out;
     out.reserve(in.size());
-    const char *cp = in.c_str();
     std::string::size_type i = 0;
     for (; i < in.size() - 2; ++i) {
-        if (cp[i] == '%') {
-            int d1 = h2d(cp[i+1]);
-            int d2 = h2d(cp[i+2]);
+        if (in[i] == '%') {
+            int d1 = h2d(in[i+1]);
+            int d2 = h2d(in[i+2]);
             if (d1 != -1 && d2 != -1) {
                 out += (d1 << 4) + d2;
             } else {
                 out += '%';
-                out += cp[i+1];
-                out += cp[i+2];
+                out += in[i+1];
+                out += in[i+2];
             }
             i += 2;
         } else {
-            out += cp[i];
+            out += in[i];
         }
     }
     while (i < in.size()) {
-        out += cp[i++];
+        out += in[i++];
     }
     return out;
 }

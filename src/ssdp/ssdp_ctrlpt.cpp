@@ -85,8 +85,8 @@ public:
 
 class SearchSendJobWorkerV4 : public SearchSendJobWorker {
 public:
-    explicit SearchSendJobWorkerV4(const NetIF::Interface& iface, SOCKET& sockRef,std::string reqBuf)
-        : SearchSendJobWorker(iface, sockRef, std::move(reqBuf)) {}
+    explicit SearchSendJobWorkerV4(const NetIF::Interface& ifa, SOCKET& sockrf, std::string buf)
+        : SearchSendJobWorker(ifa, sockrf, std::move(buf)) {}
 
     void work() override;
 };
@@ -94,8 +94,8 @@ public:
 #ifdef UPNP_ENABLE_IPV6
 class SearchSendJobWorkerV6 : public SearchSendJobWorker {
 public:
-    explicit SearchSendJobWorkerV6(const NetIF::Interface& iface, SOCKET& sockRef, std::string reqBuf)
-        : SearchSendJobWorker(iface, sockRef, std::move(reqBuf)) {}
+    explicit SearchSendJobWorkerV6(const NetIF::Interface& ifa, SOCKET& sockrf, std::string buf)
+        : SearchSendJobWorker(ifa, sockrf, std::move(buf)) {}
 
     void work() override;
 };
@@ -366,6 +366,7 @@ void ssdp_handle_ctrlpt_msg(SSDPPacketParser& parser, const struct sockaddr_stor
                     matched = !strncmp(searchArg.searchTarget.c_str(), parser.st, m);
                     break;
                 }
+                case SSDP_SERROR:
                 default:
                     matched = 0;
                     break;

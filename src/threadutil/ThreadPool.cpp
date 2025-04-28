@@ -93,17 +93,17 @@ public:
     std::condition_variable start_and_shutdown;
 
     /*! ids for jobs */
-    int lastJobId;
+    int lastJobId{0};
     /*! whether or not we are shutting down */
-    bool shuttingdown;
+    bool shuttingdown{false};
     /*! total number of threads */
-    int totalThreads;
+    int totalThreads{0};
     /*! flag that's set when waiting for a new worker thread to start */
-    int pendingWorkerThreadStart;
+    int pendingWorkerThreadStart{0};
     /*! number of threads that are currently executing jobs */
-    int busyThreads;
+    int busyThreads{0};
     /*! number of persistent threads */
-    int persistentThreads;
+    int persistentThreads{0};
     /*! low priority job Q */
     std::deque<std::unique_ptr<ThreadPoolJob>> lowJobQ;
     /*! med priority job Q */
@@ -147,20 +147,20 @@ int ThreadPool::start(const ThreadPoolAttr* attr)
 
 void ThreadPool::Internal::StatsAccountLQ(int64_t diffTime)
 {
-    this->stats.totalJobsLQ++;
-    this->stats.totalTimeLQ += static_cast<double>(diffTime);
+    stats.totalJobsLQ++;
+    stats.totalTimeLQ += static_cast<double>(diffTime);
 }
 
 void ThreadPool::Internal::StatsAccountMQ(int64_t diffTime)
 {
-    this->stats.totalJobsMQ++;
-    this->stats.totalTimeMQ += static_cast<double>(diffTime);
+    stats.totalJobsMQ++;
+    stats.totalTimeMQ += static_cast<double>(diffTime);
 }
 
 void ThreadPool::Internal::StatsAccountHQ(int64_t diffTime)
 {
-    this->stats.totalJobsHQ++;
-    this->stats.totalTimeHQ += static_cast<double>(diffTime);
+    stats.totalJobsHQ++;
+    stats.totalTimeHQ += static_cast<double>(diffTime);
 }
 
 /*!
@@ -478,12 +478,12 @@ exit_function:
 int ThreadPool::Internal::createWorker(std::unique_lock<std::mutex>& lck)
 {
     /* if a new worker is the process of starting, wait until it fully starts */
-    while (this->pendingWorkerThreadStart) {
-        this->start_and_shutdown.wait(lck);
+    while (pendingWorkerThreadStart) {
+        start_and_shutdown.wait(lck);
     }
 
-    if (this->attr.maxThreads != ThreadPoolAttr::INFINITE_THREADS &&
-        this->totalThreads + 1 > this->attr.maxThreads) {
+    if (attr.maxThreads != ThreadPoolAttr::INFINITE_THREADS &&
+        totalThreads + 1 > attr.maxThreads) {
         LOGDEB("ThreadPool::createWorker: not creating thread: too many\n");
         return EMAXTHREADS;
     }
@@ -493,13 +493,13 @@ int ThreadPool::Internal::createWorker(std::unique_lock<std::mutex>& lck)
 
     /* wait until the new worker thread starts. We can set the flag
        cause we have the lock */
-    this->pendingWorkerThreadStart = 1;
-    while (this->pendingWorkerThreadStart) {
-        this->start_and_shutdown.wait(lck);
+    pendingWorkerThreadStart = 1;
+    while (pendingWorkerThreadStart) {
+        start_and_shutdown.wait(lck);
     }
 
-    if (this->stats.maxThreads < this->totalThreads) {
-        this->stats.maxThreads = this->totalThreads;
+    if (stats.maxThreads < totalThreads) {
+        stats.maxThreads = totalThreads;
     }
 
     return 0;
@@ -530,27 +530,18 @@ void ThreadPool::Internal::addWorker(std::unique_lock<std::mutex>& lck)
     }
 }
 
-ThreadPool::Internal::Internal(const ThreadPoolAttr* attr)
+ThreadPool::Internal::Internal(const ThreadPoolAttr* in_attr)
 {
-    int retCode = 0;
-    int i = 0;
-
-    std::unique_lock<std::mutex> lck(this->mutex);
-    if (attr) {
-        this->attr = *attr;
+    std::unique_lock<std::mutex> lck(mutex);
+    if (in_attr) {
+        attr = *in_attr;
     }
-    if (SetPolicyType(this->attr.schedPolicy) != 0) {
+    if (SetPolicyType(attr.schedPolicy) != 0) {
         return;
     }
-    this->stats = ThreadPoolStats();
-    this->persistentJob = nullptr;
-    this->lastJobId = 0;
-    this->shuttingdown = false;
-    this->totalThreads = 0;
-    this->busyThreads = 0;
-    this->persistentThreads = 0;
-    this->pendingWorkerThreadStart = 0;
-    for (i = 0; i < this->attr.minThreads; ++i) {
+    stats = ThreadPoolStats();
+    int retCode = 0;
+    for (int i = 0; i < attr.minThreads; ++i) {
         retCode = createWorker(lck);
         if (retCode) {
             break;
@@ -561,7 +552,7 @@ ThreadPool::Internal::Internal(const ThreadPoolAttr* attr)
 
     if (retCode) {
         /* clean up if the min threads could not be created */
-        this->shutdown();
+        shutdown();
     } else {
         ok = true;
     }
@@ -598,7 +589,7 @@ int ThreadPool::addJob(std::unique_ptr<JobWorker> worker, ThreadPriority prio)
 {
     std::unique_lock<std::mutex> lck(m->mutex);
 
-    int totalJobs = m->highJobQ.size() + m->lowJobQ.size() + m->medJobQ.size();
+    auto totalJobs = m->highJobQ.size() + m->lowJobQ.size() + m->medJobQ.size();
     if (totalJobs >= m->attr.maxJobsTotal) {
         LOGERR("ThreadPool::addJob: too many jobs: " << totalJobs << "\n");
         return 0;
@@ -612,6 +603,7 @@ int ThreadPool::addJob(std::unique_ptr<JobWorker> worker, ThreadPriority prio)
     case MED_PRIORITY:
         m->medJobQ.push_back(std::move(job));
         break;
+    case LOW_PRIORITY:
     default:
         m->lowJobQ.push_back(std::move(job));
     }
@@ -681,20 +673,20 @@ int ThreadPool::Internal::shutdown()
 {
     std::unique_lock<std::mutex> lck(mutex);
 
-    this->highJobQ.clear();
-    this->medJobQ.clear();
-    this->lowJobQ.clear();
+    highJobQ.clear();
+    medJobQ.clear();
+    lowJobQ.clear();
 
     /* clean up long term job */
-    if (this->persistentJob) {
-        this->persistentJob = nullptr;
+    if (persistentJob) {
+        persistentJob = nullptr;
     }
     /* signal shutdown */
-    this->shuttingdown = true;
-    this->condition.notify_all();
+    shuttingdown = true;
+    condition.notify_all();
     /* wait for all threads to finish */
-    while (this->totalThreads > 0) {
-        this->start_and_shutdown.wait(lck);
+    while (totalThreads > 0) {
+        start_and_shutdown.wait(lck);
     }
 
     return 0;

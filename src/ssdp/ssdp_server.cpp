@@ -423,7 +423,7 @@ static int create_ssdp_sock_reqv4(const std::string& sadrv4, SOCKET* ssdpReqSock
 
         ssdpAddr4->sin_family = static_cast<sa_family_t>(AF_INET);
         ssdpAddr4->sin_addr.s_addr = htonl(INADDR_ANY);
-        ssdpAddr4->sin_port = htons(port);
+        ssdpAddr4->sin_port = htons(static_cast<short>(port));
         ret = bind(*ssdpReqSock, reinterpret_cast<struct sockaddr *>(ssdpAddr4), sizeof(*ssdpAddr4));
 
         if (ret == -1) {
@@ -581,7 +581,7 @@ static int create_ssdp_sock_reqv6(int index, SOCKET* ssdpReqSock, int port)
         ssdpAddr6->sin6_family = static_cast<sa_family_t>(AF_INET6);
         ssdpAddr6->sin6_addr = in6addr_any;
         ssdpAddr6->sin6_scope_id = 0;
-        ssdpAddr6->sin6_port = htons(port);
+        ssdpAddr6->sin6_port = htons(static_cast<short>(port));
         ret = bind(*ssdpReqSock, reinterpret_cast<struct sockaddr *>(ssdpAddr6), sizeof(*ssdpAddr6));
 
         if (ret == -1) {

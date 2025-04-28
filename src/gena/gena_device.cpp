@@ -192,9 +192,9 @@ static int genaNotify(const std::string& propertySet, const subscription *sub)
    though (e.g. with shared_ptr for the propertySet string. We don't
    typically have thousands of subscribed CPs... */
 struct Notification {
-    Notification(std::string sid, std::string udn, std::string pset, Upnp_SID uSID,
+    Notification(std::string _sid, std::string udn, std::string pset, Upnp_SID uSID,
                  time_t ct, UpnpDevice_Handle dh)
-        : device_handle(dh), UDN(std::move(udn)), servId(std::move(sid)), sid(std::move(uSID)),
+        : device_handle(dh), UDN(std::move(udn)), servId(std::move(_sid)), sid(std::move(uSID)),
           propertySet(std::move(pset)), ctime(ct) {}
     UpnpDevice_Handle device_handle; //
     std::string UDN;                 // Device

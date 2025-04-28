@@ -51,8 +51,9 @@
 #endif /* _WIN32 */
 
 #include "genut.h"
-#include "upnpapi.h"
+#include "upnp.h"
 #include "uri.h"
+#include "netif.h"
 
 int parse_hostport(const char *in, hostport_type *out, bool noresolve)
 {
@@ -126,6 +127,8 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
                             /* Found a valid IPv4 or IPv6 address. */
                             memcpy(&out->IPaddress, res->ai_addr, res->ai_addrlen);
                             goto found;
+                        default:
+                            break;
                         }
                     }
                 found:
@@ -147,7 +150,7 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
         srvport = c;
         while (*c != '\0' && isdigit(*c))
             c++;
-        out->strport = std::string(srvport, c - srvport);
+        out->strport = std::string(srvport, static_cast<size_t>(c - srvport));
         port = static_cast<unsigned short int>(atoi(srvport));
         if (port == 0)
             /* Bad port number. */
@@ -173,8 +176,7 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
         if (pc) {
             *pc = 0;
             pc++;
-            // Trying to guess if this is url-encoded. if the index is
-            // 25x, we're out of luck.
+            // Trying to guess if this is url-encoded. if the index is 25x, we're out of luck.
             if (*pc == '2' && *(pc+1) == '5' && isdigit(*(pc+2))) {
                 scopeidx = atoi(pc+2);
             } else {
@@ -183,7 +185,7 @@ int parse_hostport(const char *in, hostport_type *out, bool noresolve)
         }
         sai6->sin6_family = static_cast<sa_family_t>(af);
         sai6->sin6_port = htons(port);
-        sai6->sin6_scope_id = scopeidx;
+        sai6->sin6_scope_id = static_cast<unsigned int>(scopeidx);
         ret = inet_pton(AF_INET6, srvname, &sai6->sin6_addr);
     }
     break;
@@ -248,35 +250,6 @@ static inline int h2d(int c)
         return 10 + c - 'A';
 
     return -1;
-}
-
-std::string remove_escaped_chars(const std::string& in)
-{
-    if (in.size() <= 2)
-        return in;
-    std::string out;
-    out.reserve(in.size());
-    size_t i = 0;
-    for (; i < in.size() - 2; i++) {
-        if (in[i] == '%') {
-            int d1 = h2d(in[i+1]);
-            int d2 = h2d(in[i+2]);
-            if (d1 != -1 && d2 != -1) {
-                out += (d1 << 4) + d2;
-            } else {
-                out += '%';
-                out += in[i+1];
-                out += in[i+2];
-            }
-            i += 2;
-        } else {
-            out += in[i];
-        }
-    }
-    while (i < in.size()) {
-        out += in[i++];
-    }
-    return out;
 }
 
 
@@ -414,21 +387,20 @@ int parse_uri(const std::string& in, uri_type *out)
         out->path_type = REL_PATH;
     }
 
-    int begin_path = 0;
+    size_t begin_path = 0;
     if (begin_hostport + 1 < in.size() && in[begin_hostport] == '/' &&
         in[begin_hostport + 1] == '/') {
         begin_hostport += 2;
-        begin_path = parse_hostport(in.c_str() + begin_hostport, &out->hostport);
-        if (begin_path >= 0) {
-            begin_path += begin_hostport;
-        } else {
-            return begin_path;
-        }
+        auto ret = parse_hostport(in.c_str() + begin_hostport, &out->hostport);
+        if (ret < 0)
+            return ret;
+        begin_path = static_cast<size_t>(ret);
+        begin_path += begin_hostport;
     } else {
-        begin_path = static_cast<int>(begin_hostport);
+        begin_path = begin_hostport;
     }
-    std::string::size_type question = in.find('?', begin_path);
-    std::string::size_type hash = in.find('#', begin_path);
+    auto question = in.find('?', begin_path);
+    auto hash = in.find('#', begin_path);
     if (question == std::string::npos &&
         hash == std::string::npos) {
         out->path = in.substr(begin_path);
@@ -473,7 +445,8 @@ std::string maybeScopeUrlAddr(
     std::string scopedaddr = urlip.straddr(true, true);
 
     auto sa6 = reinterpret_cast<struct sockaddr_in6*>(&prsduri.hostport.IPaddress);
-    prsduri.hostport.text = std::string("[") + scopedaddr + "]:" + std::to_string(ntohs(sa6->sin6_port));
+    prsduri.hostport.text = std::string("[") + scopedaddr + "]:" +
+        std::to_string(ntohs(sa6->sin6_port));
     return uri_asurlstr(prsduri);
 }
 

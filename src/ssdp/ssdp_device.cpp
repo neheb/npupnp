@@ -125,6 +125,8 @@ void ssdp_handle_device_request(const SSDPPacketParser& parser, struct sockaddr_
             switch (GetDeviceHandleInfo(start, &handle, &dev_info)) {
             case HND_DEVICE:
                 break;
+            case HND_CLIENT:
+            case HND_INVALID:
             default:
                 /* no info found. */
                 return;
@@ -716,7 +718,8 @@ static int AdvertiseAndReplyOneDest(
                     }
                 }
                     break;
-
+                case SSDP_SERROR:
+                case SSDP_SERVICE:
                 default:
                     break;
                 }
@@ -771,6 +774,10 @@ static int AdvertiseAndReplyOneDest(
                     }
                         break;
 
+                    case SSDP_SERROR:
+                    case SSDP_ROOTDEVICE:
+                    case SSDP_DEVICEUDN:
+                    case SSDP_DEVICETYPE:
                     default:
                         break;
                     }

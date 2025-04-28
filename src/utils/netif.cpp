@@ -296,14 +296,15 @@ std::string IPAddr::straddr(bool setscope, bool forurl) const
     
     char buf[200];
     buf[0] = 0;
-    switch(m->saddr()->sa_family) {
+    auto family = m->saddr()->sa_family;
+    switch (family) {
     case AF_INET:
-        inet_ntop(m->saddr()->sa_family, &m->saddrin()->sin_addr, buf, 200);
+        inet_ntop(family, &m->saddrin()->sin_addr, buf, 200);
         break;
     case AF_INET6:
     {
         auto sa6 = m->saddrin6();
-        inet_ntop(m->saddr()->sa_family, &sa6->sin6_addr, buf, 200);
+        inet_ntop(family, &sa6->sin6_addr, buf, 200);
         if (!setscope || scopetype() != Scope::LINK) {
             return buf;
         }
@@ -312,6 +313,9 @@ std::string IPAddr::straddr(bool setscope, bool forurl) const
         s += std::string(forurl ? "%25" : "%") + scope;
         return s;
     }
+    default: // ??
+        LOGERR("IPAddr::straddr: unknown family " << family << "\n");
+        inet_ntop(family, &m->address, buf, 200);
     }
     return buf;
 }
@@ -399,10 +403,13 @@ const std::string& Interface::gethwaddr() const
 
 std::string Interface::gethexhwaddr() const
 {
+    if (m->hwaddr.size() < 6)
+        return std::string();
     char buf[20];
+    auto cp = (const unsigned char*)(m->hwaddr.c_str());
     snprintf(buf, 20, "%02x:%02x:%02x:%02x:%02x:%02x",
-             m->hwaddr[0]&0xFF, m->hwaddr[1]&0xFF, m->hwaddr[2]&0xFF,
-             m->hwaddr[3]&0xFF, m->hwaddr[4]&0xFF, m->hwaddr[5]&0xFF);
+             cp[0]&0xFF, cp[1]&0xFF, cp[2]&0xFF,
+             cp[3]&0xFF, cp[4]&0xFF, cp[5]&0xFF);
     return buf;
 }
 

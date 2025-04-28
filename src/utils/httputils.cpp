@@ -197,8 +197,7 @@ int http_FixStrUrl(const std::string& surl, uri_type *fixed_url)
  *    UPNP_E_SUCCESS
  *    UPNP_E_INVALID_URL
  ************************************************************************/
-int http_Download(const char *_surl, int timeout_secs,
-                  char **document, size_t *, char *content_type)
+int http_Download(const char *_surl, int timeout_secs, char **document, size_t *, char *content_type)
 {
     uri_type url;
     UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__, "http_Download: %s\n",_surl);
@@ -237,8 +236,7 @@ int http_Download(const char *_surl, int timeout_secs,
     }
     long http_status;
     curl_easy_getinfo (easy, CURLINFO_RESPONSE_CODE, &http_status);
-    UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__, "Response. Status %ld\n",
-               http_status);
+    UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__, "Response. Status %ld\n", http_status);
 
     curl_easy_cleanup(easy);
     curl_slist_free_all(list);
@@ -255,7 +253,7 @@ int http_Download(const char *_surl, int timeout_secs,
 
     auto it = http_headers.find("content-length");
     if (it != http_headers.end()) {
-        uint64_t sizefromheaders = atoll(it->second.c_str());
+        auto sizefromheaders = static_cast<uint64_t>(atoll(it->second.c_str()));
         if (sizefromheaders != data.size()) {
             UpnpPrintf(UPNP_INFO, HTTP, __FILE__, __LINE__,
                        "Response content-length %" PRIu64
@@ -276,7 +274,7 @@ int http_Download(const char *_surl, int timeout_secs,
         return 0;
     }
 
-    return http_status;
+    return static_cast<int>(http_status);
 }
 
 /************************************************************************

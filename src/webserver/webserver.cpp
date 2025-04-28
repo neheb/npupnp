@@ -44,17 +44,18 @@
 #include "webserver.h"
 
 #include <algorithm>
+#include <cstring>
 #include <cassert>
 #include <cinttypes>
 #include <map>
 #include <mutex>
 #include <unordered_map>
 
-#include "genut.h"
 #include "ssdplib.h"
 #include "statcodes.h"
 #include "upnpapi.h"
 #include "uri.h"
+#include "smallut.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -466,7 +467,7 @@ static int process_request(
 
     /* Unescape and canonize the path. Note that MHD has already
        stripped a possible query part ("?param=value...)  for us */
-    std::string request_doc = remove_escaped_chars(mhdt->url);
+    std::string request_doc = pc_decode(mhdt->url);
     request_doc = remove_dots(request_doc);
     if (request_doc.empty()) {
         return HTTP_FORBIDDEN;

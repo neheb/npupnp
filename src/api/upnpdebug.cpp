@@ -51,18 +51,18 @@ static std::mutex GlobalDebugMutex;
 static Upnp_LogLevel g_log_level = UPNP_DEFAULT_LOG_LEVEL;
 
 /* Output file pointer */
-static FILE *fp;
-static int is_stderr;
+static FILE *o_fp;
+static int o_is_stderr;
 
 /* Set if the user called setlogfilename() or setloglevel() */
-static int setlogwascalled;
+static int o_setlogwascalled;
 /* Name of the output file. We keep a copy */
-static std::string fileName;
+static std::string o_fileName;
 
 /* This can be called multiple times, for example to rotate the log file.*/
 int UpnpInitLog(void)
 {
-    if (setlogwascalled == 0) {
+    if (o_setlogwascalled == 0) {
         const char* envlevel = getenv("NPUPNP_LOGLEVEL");
         const char* envfn = getenv("NPUPNP_LOGFILENAME");
         /* Maybe a call from UpnpInit(). If the user did not ask for
@@ -75,23 +75,24 @@ int UpnpInitLog(void)
             g_log_level = static_cast<Upnp_LogLevel>(atoi(envlevel));
         }
         if (envfn) {
-            fileName = envfn;
+            o_fileName = envfn;
         }
     }
-    if (fp && !is_stderr) {
-        fclose(fp);
-        fp = nullptr;
-        is_stderr = 0;
+    if (o_fp && !o_is_stderr) {
+        fclose(o_fp);
+        o_fp = nullptr;
+        o_is_stderr = 0;
     }
-    if (!fileName.empty()) {
-        if ((fp = fopen(fileName.c_str(), "a")) == nullptr) {
-            std::cerr<<"UpnpDebug: failed to open ["<< fileName << "] : " << strerror(errno) << "\n";
+    if (!o_fileName.empty()) {
+        if ((o_fp = fopen(o_fileName.c_str(), "a")) == nullptr) {
+            std::cerr << "UpnpDebug: failed to open [" << o_fileName << "] : " <<
+                strerror(errno) << "\n";
         }
-        is_stderr = 0;
+        o_is_stderr = 0;
     }
-    if (fp == nullptr) {
-        fp = stderr;
-        is_stderr = 1;
+    if (o_fp == nullptr) {
+        o_fp = stderr;
+        o_is_stderr = 1;
     }
     return UPNP_E_SUCCESS;
 }
@@ -99,29 +100,29 @@ int UpnpInitLog(void)
 void UpnpSetLogLevel(Upnp_LogLevel log_level)
 {
     g_log_level = log_level;
-    setlogwascalled = 1;
+    o_setlogwascalled = 1;
 }
 
 void UpnpCloseLog(void)
 {
     std::scoped_lock lck(GlobalDebugMutex);
 
-    if (fp != nullptr && is_stderr == 0) {
-        fclose(fp);
+    if (o_fp != nullptr && o_is_stderr == 0) {
+        fclose(o_fp);
     }
-    fp = nullptr;
-    is_stderr = 0;
+    o_fp = nullptr;
+    o_is_stderr = 0;
 }
 
 void UpnpSetLogFileNames(const char *newFileName, const char *ignored)
 {
     (void)ignored;
 
-    fileName.clear();
+    o_fileName.clear();
     if (newFileName && *newFileName) {
-        fileName = newFileName;
+        o_fileName = newFileName;
     }
-    setlogwascalled = 1;
+    o_setlogwascalled = 1;
 }
 
 static int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
@@ -180,15 +181,15 @@ void UpnpPrintf(
         return;
 
     std::scoped_lock lck(GlobalDebugMutex);
-    if (fp == nullptr) {
+    if (o_fp == nullptr) {
         return;
     }
 
     va_start(ArgList, FmtStr);
     if (DbgFileName) {
-        UpnpDisplayFileAndLine(fp, DbgFileName, DbgLineNo, DLevel, Module);
-        vfprintf(fp, FmtStr, ArgList);
-        fflush(fp);
+        UpnpDisplayFileAndLine(o_fp, DbgFileName, DbgLineNo, DLevel, Module);
+        vfprintf(o_fp, FmtStr, ArgList);
+        fflush(o_fp);
     }
     va_end(ArgList);
 }
@@ -200,5 +201,5 @@ FILE *UpnpGetDebugFile(Upnp_LogLevel DLevel, Dbg_Module Module)
     if (!DebugAtThisLevel(DLevel, Module)) {
         return nullptr;
     }
-    return fp;
+    return o_fp;
 }

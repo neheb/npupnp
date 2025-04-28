@@ -121,12 +121,6 @@ inline std::string uri_asurlstr(const uri_type& u)
     return surl;
 }
 
-/*!
- * Removes http escaped characters such as: "%20" and replaces them with
- * their character representation. i.e. "hello%20foo" -> "hello foo".
- */
-std::string remove_escaped_chars(const std::string& in);
-
 /* Removes ".", and ".." from a path.
  *
  * If a ".." can not be resolved (i.e. the .. would go past the root of the

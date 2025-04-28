@@ -225,6 +225,13 @@ static VHH_Status validate_host_header(MHDTransaction* mhdt, const NetIF::IPAddr
         case HTTPMETHOD_POST:
         case HTTPMETHOD_SIMPLEGET:
             break;
+        case HTTPMETHOD_MPOST:
+        case HTTPMETHOD_SUBSCRIBE:
+        case HTTPMETHOD_UNSUBSCRIBE:
+        case HTTPMETHOD_NOTIFY:
+        case HTTPMETHOD_MSEARCH:
+        case HTTPMETHOD_UNKNOWN:
+        case SOAPMETHOD_POST:
         default:
             UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__,
                        "answer_to_connection: bad HOST header %s (host name) in non-web "
@@ -336,7 +343,9 @@ static MHD_Result answer_to_connection(
         switch (validate_host_header(mhdt, claddr)) {
         case VHH_YES: return MHD_YES;
         case VHH_NO: return MHD_NO;
-        case VHH_REDIRECT: break;
+        case VHH_REDIRECT:
+        default:
+            break;
         }
 
         // Redirect
@@ -391,6 +400,9 @@ static MHD_Result answer_to_connection(
         callback = gGetCallback;
         break;
     }
+    case HTTPMETHOD_MSEARCH:
+    case HTTPMETHOD_SIMPLEGET:
+    case HTTPMETHOD_UNKNOWN:
     default:
         callback = nullptr;
     }
@@ -583,7 +595,7 @@ static int get_port(SOCKET sockfd, uint16_t *port)
     } else if(sockinfo.ss_family == AF_INET6) {
         *port = ntohs(reinterpret_cast<struct sockaddr_in6*>(&sockinfo)->sin6_port);
     }
-    UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__, "get_port: sockfd = %d, .... port = %d\n",
+    UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__, "get_port: sockfd = %d, .... port = %u\n",
                static_cast<int>(sockfd), static_cast<unsigned int>(*port));
 
     return 0;
@@ -764,8 +776,8 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
                    "miniserver: available_port() failed !\n");
         return port;
     }
-    *listen_port4 = port;
-    *listen_port6 = port;
+    *listen_port4 = static_cast<unsigned short>(port);
+    *listen_port6 = static_cast<unsigned short>(port);
 
     /* SSDP socket for discovery/advertising. */
     ret_code = get_ssdp_sockets(miniSocket, port);
@@ -804,7 +816,7 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
 #endif /* UPNP_ENABLE_IPV6 */
     
     mhd = MHD_start_daemon(
-        mhdflags, port,
+        mhdflags, static_cast<unsigned short>(port),
         filter_connections, nullptr, /* Accept policy callback and arg */
         &answer_to_connection, nullptr, /* Request handler and arg */
         MHD_OPTION_EXTERNAL_LOGGER, mhdlogger, nullptr, 

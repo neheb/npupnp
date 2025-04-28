@@ -775,6 +775,8 @@ EXPORT_SPEC int UpnpFinish()
     case HND_CLIENT:
         UpnpUnRegisterClient(client_handle);
         break;
+    case HND_DEVICE:
+    case HND_INVALID:
     default:
         break;
     }
@@ -842,6 +844,7 @@ EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const struct sockaddr_storag
         port = UpnpGetServerPort6();
             break;
 #endif
+    case NetIF::IPAddr::Family::Invalid:
     default:
         return {};
     }
@@ -921,7 +924,7 @@ static int GetFreeHandle()
     auto it = std::find(std::next(HandleTable.begin()), HandleTable.end(), nullptr);
     if (it == HandleTable.end())
         return UPNP_E_OUTOF_HANDLE;
-    return std::distance(HandleTable.begin(), it);
+    return static_cast<int>(std::distance(HandleTable.begin(), it));
 }
 
 /*!
@@ -1913,6 +1916,8 @@ Upnp_Handle_Type GetDeviceHandleInfo(
         switch (GetHandleInfo(*device_handle_out, HndInfo)) {
         case HND_DEVICE:
             return HND_DEVICE;
+        case HND_CLIENT:
+        case HND_INVALID:
         default:
             break;
         }
@@ -1962,6 +1967,8 @@ int PrintHandleInfo(UpnpClient_Handle Hnd)
     switch (HndInfo->HType) {
     case HND_CLIENT:
         break;
+    case HND_DEVICE:
+    case HND_INVALID:
     default:
         UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__, "DescURL: %s\n", HndInfo->DescURL);
     }

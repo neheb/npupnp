@@ -125,10 +125,10 @@ void TimerJobWorker::work()
     }
 }
 
-TimerThread::Internal::Internal(ThreadPool *tp)
+TimerThread::Internal::Internal(ThreadPool *pool)
 {
     std::scoped_lock lck(mutex);
-    this->tp = tp;
+    tp = pool;
     auto worker = std::make_unique<TimerJobWorker>(this);
     tp->addPersistent(std::move(worker), ThreadPool::HIGH_PRIORITY);
 }
