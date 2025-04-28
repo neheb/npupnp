@@ -261,7 +261,7 @@ static int mycallback(Upnp_EventType etyp, const void *evt, void *ctxt)
         goto dldesc;
     case UPNP_DISCOVERY_SEARCH_TIMEOUT:
     {
-        std::unique_lock<std::mutex> loclock;
+        std::unique_lock<std::mutex> loclock(locations_mutex);
         searchdone = true;
         locations_cv.notify_all();
     }
@@ -273,7 +273,7 @@ static int mycallback(Upnp_EventType etyp, const void *evt, void *ctxt)
     return 0;
 
 dldesc:
-    std::unique_lock<std::mutex> loclock;
+    std::unique_lock<std::mutex> loclock(locations_mutex);
     locations.insert(dsp->Location);
     locations_cv.notify_all();
     return 0;
@@ -359,7 +359,7 @@ _headerString_ is a value for the SOAP header, and is generally not needed
 and empty.
 
 _actionURL_ is the field named _controlURL_ in the XML description document
-and its libupnpp parsed version.
+and its npupnp parsed version.
 
 _serviceType_ also comes from the parsed description.
 
