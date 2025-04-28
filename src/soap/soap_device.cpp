@@ -295,7 +295,9 @@ static int get_dev_service(const MHDTransaction *mhdt, soap_devserv_t *soap_info
     auto hdltp = GetDeviceHandleInfoForPath(mhdt->url, &device_hnd, &hdlinfo, &serv_info);
 
     if (hdltp != HND_DEVICE || nullptr == serv_info) {
-        UpnpPrintf(UPNP_ERROR, SOAP, __FILE__, __LINE__, "get_dev_service: client not found.\n");
+        // Note that this can very well happen if we are a CP and being spammed by some other
+        // confused CP, so limit the error level.
+        UpnpPrintf(UPNP_INFO, SOAP, __FILE__, __LINE__, "get_dev_service: client not found.\n");
         return -1;
     }
 

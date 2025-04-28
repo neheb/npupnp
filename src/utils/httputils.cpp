@@ -44,6 +44,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <string>
+#include <mutex>
 
 #include <curl/curl.h>
 #include <microhttpd.h>
@@ -368,6 +369,8 @@ static tm* http_gmtime_r(const time_t* clock, tm* result)
 
 static const std::string& get_sdk_common_info()
 {
+    static std::mutex lmutex;
+    std::lock_guard<std::mutex> llock(lmutex);
     static std::string sdk_common_info;
     if (sdk_common_info.empty()) {
         std::ostringstream ostr;
@@ -405,6 +408,8 @@ std::string get_sdk_device_info(const std::string& customvalue)
 
 const std::string& get_sdk_client_info(const std::string& newvalue)
 {
+    static std::mutex lmutex;
+    std::lock_guard<std::mutex> llock(lmutex);
     static std::string sdk_client_info;
     if (sdk_client_info.empty() || !newvalue.empty()) {
         // If this was never set, or the client wants to set its name, compute
