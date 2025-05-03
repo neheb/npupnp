@@ -162,6 +162,4 @@ libnpupnp_dep = declare_dependency(
   link_with: libnpupnp,
 )
 
-if get_option('testmains')
-    subdir('test')
-endif
+subdir('test')
