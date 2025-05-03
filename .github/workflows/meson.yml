@@ -181,13 +181,24 @@ jobs:
       - uses: actions/checkout@v4
       - uses: vmactions/netbsd-vm@v1
         with:
-          release: '9.0'
           prepare: |
             /usr/sbin/pkg_add curl meson pkgconf libmicrohttpd
           run: |
             meson setup "${{github.workspace}}/build" -Dwarning_level=3
             meson compile -C "${{github.workspace}}/build" --verbose
             meson test -C "${{github.workspace}}/build" --verbose
+  OmniOS:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/omnios-vm@v1
+        with:
+          prepare: |
+            pkg install curl gcc14 libmicrohttpd meson-312 ninja pkg-config python-312
+          run: |
+            /usr/lib/python3.12/bin/meson setup "${{github.workspace}}/build" -Dwarning_level=3
+            /usr/lib/python3.12/bin/meson compile -C "${{github.workspace}}/build" --verbose
+            /usr/lib/python3.12/bin/meson test -C "${{github.workspace}}/build" --verbose
   OpenBSD:
     runs-on: ubuntu-latest
     steps:
