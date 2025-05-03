@@ -53,7 +53,7 @@ add_project_arguments(
   language: 'cpp',
 )
 
-libnpupnp_incdir = include_directories('.', 'inc', 'src/inc')
+libnpupnp_incdir = include_directories('inc', 'src/inc')
 
 npupnp_sources = files(
   'src/api/upnpapi.cpp',
@@ -133,8 +133,8 @@ auto.set('UPNP_ENABLE_IPV6', get_option('ipv6'))
 auto.set10('UPNP_HAVE_CLIENT', get_option('client'))
 auto.set10('UPNP_HAVE_WEBSERVER', get_option('webserver'))
 
-ufile = configure_file(output: 'upnpconfig.h', configuration: auto)
 cfile = configure_file(output: 'autoconfig.h', configuration: auto)
+subdir('inc')
 
 libnpupnp = library(
   'libnpupnp',
@@ -155,20 +155,10 @@ pkg.generate(
   subdirs: 'npupnp',
 )
 
-install_headers(
-  'inc/netif.h',
-  'inc/upnpdebug.h',
-  'inc/upnpdescription.h',
-  'inc/UpnpGlobal.h',
-  'inc/upnp.h',
-  'inc/upnptools.h',
-  ufile,
-  subdir: 'npupnp',
-)
-
+depinc = include_directories('inc')
 libnpupnp_dep = declare_dependency(
   compile_args: get_option('default_library') == 'static' ? '-DUPNP_STATIC_LIB' : [],
-  include_directories: libnpupnp_incdir,
+  include_directories: depinc,
   link_with: libnpupnp,
 )
 
