@@ -1,4 +1,4 @@
-/* Copyright (C) 2016 J.F.Dockes
+/* Copyright (C) 2016-2025 J.F.Dockes
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Lesser General Public License as published by
  *   the Free Software Foundation; either version 2.1 of the License, or
@@ -16,50 +16,46 @@
  */
 #include "netif.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <getopt.h>
-
 #include <string>
 #include <iostream>
 
-using namespace std;
-
 static int       op_flags;
 #define OPT_i    0x1
-static struct option long_options[] = {
-    {"interface", required_argument, 0, 'i'},
-    {0, 0, 0, 0}
-};
+#define OPT_f    0x2
 
 static char *thisprog;
 static char usage [] =
     " Default: dump interface configuration\n"
     "-i <testaddr>  : find interface for address.\n"
+    "-f             : filter for non-loopback+ipv4.\n"
     ;
 
-static void
-Usage(void)
+static void Usage(void)
 {
-    fprintf(stderr, "%s: usage:\n%s", thisprog, usage);
+    std::cerr << thisprog << ": usage:\n" << usage;
     exit(1);
 }
 
 int main(int argc, char *argv[])
 {
-    thisprog = argv[0];
-    int ret;
     std::string addr;
-    while ((ret = getopt_long(argc, argv, "i:",
-                              long_options, NULL)) != -1) {
-        switch (ret) {
-        case 'i': addr = optarg;op_flags |= OPT_i; break;
-        default:
+    thisprog = argv[0];
+    argc--; argv++;
+    while (argc > 0 && **argv == '-') {
+        (*argv)++;
+        if (!(**argv))
             Usage();
-        }
+        while (**argv)
+            switch (*(*argv)++) {
+            case 'i': op_flags |= OPT_i; if (argc < 2)  Usage();
+                addr = *(++argv); argc--; 
+                goto b1;
+            case 'f': op_flags |= OPT_f;break;
+            default: Usage();   break;
+            }
+    b1: argc--; argv++;
     }
+
     NetIF::Interfaces *ifs = NetIF::Interfaces::theInterfaces();
     if (op_flags == 0) {
         ifs->print(std::cout);
@@ -73,8 +69,7 @@ int main(int argc, char *argv[])
         NetIF::Interfaces::Filter filt;
         std::vector<NetIF::Interface> vifs = ifs->select(filt);
         NetIF::IPAddr haddr;
-        const NetIF::Interface *the_if =
-            NetIF::Interfaces::interfaceForAddress(ipaddr, vifs, haddr);
+        const NetIF::Interface *the_if = NetIF::Interfaces::interfaceForAddress(ipaddr, vifs, haddr);
 
         if (nullptr == the_if) {
             std::cerr << "No interface found for " << ipaddr.straddr() << "\n";
@@ -83,12 +78,12 @@ int main(int argc, char *argv[])
         std::cout << "Interface for " << ipaddr.straddr() << " : \n\n";
         the_if->print(std::cout);
         std::cout << " \nhost address: " << haddr.straddr() << "\n";
-    } else if (0) {
+    } else if (op_flags & OPT_f) {
         NetIF::Interfaces::Filter filt{
             .needs={NetIF::Interface::Flags::HASIPV4},
             .rejects={NetIF::Interface::Flags::LOOPBACK}};
         std::vector<NetIF::Interface> myifs = ifs->select(filt);
-        cout << "\nSelected:\n";
+        std::cout << "\nSelected:\n";
         for (const auto& entry : myifs)
             entry.print(std::cout);
     } else {
