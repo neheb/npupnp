@@ -237,22 +237,6 @@ static size_t parse_scheme(const std::string& in, std::string& out)
     return out.size();
 }
 
-
-/*!
- * \brief Replaces an escaped sequences with theur unescaped version as in
- * http://www.ietf.org/rfc/rfc2396.txt    (RFC explaining URIs)
- */
-static inline int h2d(int c)
-{
-    if ('0' <= c && c <= '9')
-        return c - '0';
-    if ('A' <= c && c <= 'F')
-        return 10 + c - 'A';
-
-    return -1;
-}
-
-
 std::string remove_dots(const std::string& in)
 {
     static const std::string markers("/?");
