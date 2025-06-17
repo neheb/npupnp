@@ -49,10 +49,11 @@
 #include "miniserver.h"
 
 #include "ThreadPool.h"
-#include "genut.h"
+#include "smallut.h"
 #include "ssdplib.h"
 #include "upnpapi.h"
 #include "uri.h"
+#include "statcodes.h"
 
 #include <cerrno>
 #include <chrono>
@@ -355,7 +356,7 @@ static MHD_Result answer_to_connection(
         }
         UpnpPrintf(UPNP_INFO, MSERV, __FILE__, __LINE__, "Redirecting to [%s]\n", aurl.c_str());
         struct MHD_Response *response =
-            MHD_create_response_from_buffer(0,nullptr,MHD_RESPMEM_PERSISTENT);
+            MHD_create_response_from_buffer(0, nullptr, MHD_RESPMEM_PERSISTENT);
         if (nullptr == response ) {
             UpnpPrintf(UPNP_DEBUG, MSERV, __FILE__, __LINE__,
                        "answer_to_connection: can't create redirect\n");
@@ -369,6 +370,18 @@ static MHD_Result answer_to_connection(
 
     auto mhdt = static_cast<MHDTransaction *>(*con_cls);
     if (*upload_data_size) {
+        if (mhdt->postdata.size() + *upload_data_size > g_maxContentLength) {
+            struct MHD_Response *response =
+                MHD_create_response_from_buffer(0, nullptr, MHD_RESPMEM_PERSISTENT);
+            if (nullptr == response ) {
+                UpnpPrintf(UPNP_DEBUG, MSERV, __FILE__, __LINE__,
+                           "answer_to_connection: can't create 413\n");
+                return MHD_NO;
+            }
+            MHD_queue_response(conn, HTTP_REQ_ENTITY_TOO_LARGE, response);
+            MHD_destroy_response(response);
+            return MHD_NO;
+        }
         mhdt->postdata.append(upload_data, *upload_data_size);
         *upload_data_size = 0;
         return MHD_YES;

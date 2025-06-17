@@ -1000,7 +1000,7 @@ EXPORT_SPEC const char *UpnpGetServerUlaGuaIp6Address(void);
  * If set to 0 then checking will be disabled.
  *
  * The default maximum content-length is \c DEFAULT_SOAP_CONTENT_LENGTH 
- * = 16K bytes.
+ * = 2 MBytes
  *  
  * @return \c UPNP_E_SUCCESS.
  */

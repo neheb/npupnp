@@ -496,8 +496,17 @@ size_t write_callback_null_curl(char *buffer, size_t size, size_t nitems, std::s
     return size*nitems;
 }
 
+// Not worth including upnpapi.h just for this.
+extern size_t g_maxContentLength;
+
 size_t write_callback_str_curl(char *buf, size_t sz, size_t nits, std::string *s)
 {
+    if (s->size() + sz * nits > g_maxContentLength) {
+        std::cerr << "Total read size exceeds maxContentLength\n";
+        UpnpPrintf(UPNP_ERROR, SOAP, __FILE__, __LINE__,
+                   "Total read size exceeds maxContentLength\n");
+        return CURL_WRITEFUNC_ERROR;
+    }
     s->append(buf, sz * nits);
     return sz * nits;
 }

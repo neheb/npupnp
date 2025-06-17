@@ -195,14 +195,15 @@ typedef intptr_t ssize_t;
 /*!
  * \name DEFAULT_SOAP_CONTENT_LENGTH
  *
+ * Misnomer because also used for GENA POST data.
  * SOAP messages will read at most {\tt DEFAULT_SOAP_CONTENT_LENGTH} bytes.  
  * This prevents devices that have a misbehaving web server to send 
  * a large amount of data to the control point causing it to crash.  
  * This can be adjusted dynamically with {\tt UpnpSetMaxContentLength}.
- *
+ * This is used both for POST and response data and used to be 16k. Now adjusted to 2MB.
  * @{
  */
-#define DEFAULT_SOAP_CONTENT_LENGTH 16000
+#define DEFAULT_SOAP_CONTENT_LENGTH 2000*1024
 /* @} */
 
 
