@@ -849,7 +849,7 @@ EXPORT_SPEC std::string UpnpGetUrlHostPortForClient(const struct sockaddr_storag
         return {};
     }
 
-    return prefix + hostaddr.straddr() + (prefix.empty() ? "" : "]") + ":" + lltodecstr(port);
+    return prefix + hostaddr.straddr() + (prefix.empty() ? "" : "]") + ":" + std::to_string(port);
 }
 
 EXPORT_SPEC unsigned short UpnpGetServerPort()

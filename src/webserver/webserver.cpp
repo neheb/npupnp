@@ -714,9 +714,9 @@ static void web_server_callback(MHDTransaction *mhdt)
             mhdt->response = MHD_create_response_from_callback(
                 RespInstr.ReadSendSize, 4096, vFileReaderCallback, ctx, vFileFreeCallback);
             if (RespInstr.IsPartial) {
-                std::string bytesrange = std::string("bytes ") + lltodecstr(RespInstr.offset) + "-" +
-                    lltodecstr(RespInstr.offset + RespInstr.ReadSendSize -1) + "/" +
-                    lltodecstr(RespInstr.TotalSize);
+                std::string bytesrange = std::string("bytes ") + std::to_string(RespInstr.offset) +
+                    "-" + std::to_string(RespInstr.offset + RespInstr.ReadSendSize -1) + "/" +
+                    std::to_string(RespInstr.TotalSize);
                 MHD_add_response_header(mhdt->response, "Content-Range", bytesrange.c_str());
                 mhdt->httpstatus = 206;
             } else {
