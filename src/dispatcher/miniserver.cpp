@@ -457,8 +457,7 @@ static int receive_from_stopSock(SOCKET ssock, fd_set *set)
     if (FD_ISSET(ssock, set)) {
         len = sizeof(ss);
         ss = {};
-        byteReceived = recvfrom(
-            ssock, requestBuf, static_cast<size_t>(25), 0, fromaddr, &len);
+        byteReceived = recvfrom(ssock, requestBuf, static_cast<size_t>(25), 0, fromaddr, &len);
         
         if (byteReceived > 0) {
             requestBuf[byteReceived] = '\0';
@@ -479,12 +478,13 @@ class MiniServerJobWorker : public JobWorker {
 public:
     void work() override;
 };
+
+
 /*!
- * \brief Run the miniserver.
- *
- * The MiniServer accepts a new request and schedules a thread to handle the
- * new request. Checks for socket state and invokes appropriate read and
- * shutdown actions for the Miniserver and SSDP sockets.
+ * miniserver thread: this manages selecting from the SSDP and stop request sockets.
+ * When an SSDP socket is ready, ssdp_server.cpp readFromSSDPSocket() is called to create a task to
+ * process the packet.
+ * We exit when requested on the Stop socket.
  */
 void MiniServerJobWorker::work()
 {
@@ -837,9 +837,8 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
         MHD_OPTION_CONNECTION_TIMEOUT, static_cast<unsigned int>(HTTP_DEFAULT_TIMEOUT),
         MHD_OPTION_END);
     if (nullptr == mhd) {
-        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
-                   "MHD_start_daemon failed\n");
-        ret_code = UPNP_E_OUTOF_MEMORY;
+        UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__, "MHD_start_daemon failed\n");
+        ret_code = UPNP_E_INIT_FAILED;
         goto out;
     }
 #endif
@@ -847,8 +846,12 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
 out:
     if (ret_code != UPNP_E_SUCCESS) {
         UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__, "startminiserver failed\n");
-        delete miniSocket;
-        miniSocket = nullptr;
+        if (gMServState != MSERV_RUNNING) {
+            // Only delete the socket array, if the miniserver thread is not running, it is needed
+            // to stop it. If the thread is running, it will clean up the array when it exits.
+            delete miniSocket;
+            miniSocket = nullptr;
+        }
     }
     return ret_code;
 }
