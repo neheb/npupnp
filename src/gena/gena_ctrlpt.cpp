@@ -257,7 +257,7 @@ static std::string myCallbackUrl(const NetIF::IPAddr& netaddr)
     if (netaddr.family() == NetIF::IPAddr::Family::IPV6) {
         oss << "]";
     }
-    oss << ":" << (netaddr.family() == NetIF::IPAddr::Family::IPV6 ? LOCAL_PORT_V6 : LOCAL_PORT_V4);
+    oss << ":" << g_listen_port;
     return oss.str();
 }
 

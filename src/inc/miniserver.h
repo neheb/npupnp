@@ -113,41 +113,13 @@ void SetSoapCallback(
 static inline void SetSoapCallback(MiniServerCallback callback) {}
 #endif /* INCLUDE_DEVICE_APIS */
 
-/*!
- * \brief Set GENA Callback.
- */
-void SetGenaCallback(
-    /*! [in] GENA Callback to be invoked. */
-    MiniServerCallback callback);
+/* Set callback for GENA (eventing) messages */
+void SetGenaCallback(MiniServerCallback callback);
 
-/*!
- * \brief Initialize the sockets functionality for the Miniserver.
- *
- * Initialize a thread pool job to run the MiniServer and the job to the
- * thread pool.
- *
- * If listen port is 0, port is dynamically picked.
- *
- * Use timer mechanism to start the MiniServer, failure to meet the
- * allowed delay aborts the attempt to launch the MiniServer.
- *
- * \return
- *    \li On success: UPNP_E_SUCCESS.
- *    \li On error: UPNP_E_XXX.
- */
-int StartMiniServer(
-    /*! [in,out] Port on which the server listens for incoming IPv4
-     * connections. */
-    uint16_t *listen_port4,
-    /*! [in,out] Port on which the server listens for incoming IPv6
-     * connections. */
-    uint16_t *listen_port6);
+/* Initialize the sockets and start the  Miniserver thread (ssdp listener). */
+int StartMiniServer(uint16_t *listen_port);
 
-/*!
- * \brief Stop and Shutdown the MiniServer and free socket resources.
- *
- * \return Always returns 0.
- */
+/* Stop and Shutdown the MiniServer and free socket resources. */
 int StopMiniServer();
 
 // Retrieve the sockets arrays used for CP SSDP search requests

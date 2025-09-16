@@ -178,8 +178,8 @@ Upnp_Handle_Type GetDeviceHandleInfoForPath(
     service_info **serv_info
     );
 
-extern unsigned short LOCAL_PORT_V4;
-extern unsigned short LOCAL_PORT_V6;
+extern unsigned short g_listen_port;
+
 /* The network interfaces we were told to use */
 extern std::vector<NetIF::Interface> g_netifs;
 /* Small optimisation: if the interfaces parameter to UpnpInit2() was

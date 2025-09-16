@@ -770,7 +770,7 @@ std::vector<SOCKET>& miniServerGetReqSocks6()
 #endif
 
 /* @param[input,output] listen_port4/6 listening ports for incoming HTTP. */
-int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
+int StartMiniServer(uint16_t *listen_port)
 {
     int port=0;
     int ret_code = UPNP_E_OUTOF_MEMORY;
@@ -800,14 +800,13 @@ int StartMiniServer(uint16_t *listen_port4, uint16_t *listen_port6)
     }
 
     /* Check what port we should listen on */
-    port = available_port(static_cast<int>(*listen_port4));
+    port = available_port(static_cast<int>(*listen_port));
     if (port < 0) {
         UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
                    "miniserver: available_port() failed !\n");
         return port;
     }
-    *listen_port4 = static_cast<unsigned short>(port);
-    *listen_port6 = static_cast<unsigned short>(port);
+    *listen_port = static_cast<unsigned short>(port);
 
     /* SSDP socket for discovery/advertising. */
     ret_code = get_ssdp_sockets(miniSocket, port);

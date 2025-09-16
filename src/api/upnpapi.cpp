@@ -128,9 +128,7 @@ static int o_networkWaitSeconds = 60;
 const std::string g_HostForTemplate{"@HOST_ADDR_FOR@"};
 
 /*! local IPv4 port for the mini-server */
-unsigned short LOCAL_PORT_V4;
-/*! local IPv6 port for the mini-server */
-unsigned short LOCAL_PORT_V6;
+unsigned short g_listen_port;
 
 /*! UPnP device and control point handle table    */
 #define NUM_HANDLE 200
@@ -530,8 +528,8 @@ static int UpnpInitStartServers(unsigned short DestPort)
 #endif
 
 #if EXCLUDE_MINISERVER == 0
-    LOCAL_PORT_V4 = LOCAL_PORT_V6 = DestPort;
-    retVal = StartMiniServer(&LOCAL_PORT_V4, &LOCAL_PORT_V6);
+    g_listen_port = DestPort;
+    retVal = StartMiniServer(&g_listen_port);
     if (retVal != UPNP_E_SUCCESS) {
         UpnpPrintf(UPNP_CRITICAL, API, __FILE__, __LINE__, "Miniserver start error\n");
         UpnpFinish();
@@ -629,7 +627,7 @@ static int upnpInitCommon(const char *hostIP, const char *ifName, unsigned short
     }
     UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Upnpinit: retVal %d Host Ip: %s Host Port: %d\n",
                retVal, g_netifs.begin()->firstipv4addr()->straddr().c_str(),
-               static_cast<int>(LOCAL_PORT_V4));
+               static_cast<int>(g_listen_port));
 
 exit_function:
     return retVal;
@@ -857,7 +855,7 @@ EXPORT_SPEC unsigned short UpnpGetServerPort()
     if (UpnpSdkInit != 1)
         return 0U;
 
-    return LOCAL_PORT_V4;
+    return g_listen_port;
 }
 
 EXPORT_SPEC unsigned short UpnpGetServerPort6()
@@ -866,7 +864,7 @@ EXPORT_SPEC unsigned short UpnpGetServerPort6()
     if (UpnpSdkInit != 1)
         return 0U;
 
-    return LOCAL_PORT_V6;
+    return g_listen_port;
 #else
     return 0;
 #endif
@@ -1259,8 +1257,7 @@ out:
 static std::string descurl(int family, const std::string& nm)
 {
     std::ostringstream url;
-    url << "http://" << g_HostForTemplate << ":" <<
-        (family == AF_INET ? LOCAL_PORT_V4 : LOCAL_PORT_V6) << "/" << nm;
+    url << "http://" << g_HostForTemplate << ":" << g_listen_port << "/" << nm;
     return url.str();
 }
 
