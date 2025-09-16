@@ -662,7 +662,10 @@ static int get_miniserver_stopsock(MiniServerSockArray *out)
 
 static int available_port(int reqport)
 {
-    SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    auto af = AF_INET;
+    if (using_ipv6())
+        af = AF_INET6;
+    SOCKET sock = socket(af, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET) {
         std::string errorDesc;
         NetIF::getLastError(errorDesc);
@@ -682,16 +685,30 @@ static int available_port(int reqport)
     int port = reqport <= 0 ? APPLICATION_LISTENING_PORT : reqport;
     int ret = UPNP_E_SOCKET_BIND;
     struct sockaddr_storage saddr = {};
-    auto ip = reinterpret_cast<struct sockaddr_in*>(&saddr);
-    ip->sin_family = AF_INET;
-    ip->sin_addr.s_addr = htonl(INADDR_ANY);
+    auto ip4 = reinterpret_cast<struct sockaddr_in*>(&saddr);
+    auto ip6 = reinterpret_cast<struct sockaddr_in6*>(&saddr);
+    int addrlen;
+    if (using_ipv6()) {
+        addrlen = sizeof(struct sockaddr_in6);
+        memset (ip6, 0, addrlen);
+        ip6->sin6_family = AF_INET6;
+        ip6->sin6_port = htons (port);
+        ip6->sin6_addr = IN6ADDR_ANY_INIT;
+    } else {
+        addrlen = sizeof(struct sockaddr_in);
+        ip4->sin_family = AF_INET;
+        ip4->sin_addr.s_addr = htonl(INADDR_ANY);
+    }
     for (int i = 0; i < 20; i++) {
         bool eaddrinuse{false};
         int lastError;
         std::string errorDesc;
-        ip->sin_port = htons(static_cast<uint16_t>(port));
-        if (bind(sock, reinterpret_cast<struct sockaddr*>(&saddr),
-                 sizeof(struct sockaddr_in)) == 0) {
+        if (using_ipv6()) {
+            ip6->sin6_port = htons (static_cast<uint16_t>(port));
+        } else {
+            ip4->sin_port = htons(static_cast<uint16_t>(port));
+        }
+        if (bind(sock, reinterpret_cast<struct sockaddr*>(&saddr), addrlen) == 0) {
             ret = port;
             break;
         }
