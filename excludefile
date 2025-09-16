@@ -7,6 +7,7 @@
 .github
 .gitignore
 build
+compile_commands.json
 core
 debian
 excludefile
