@@ -3,7 +3,7 @@
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
  * Copyright (C) 2011-2012 France Telecom All rights reserved.
- * Copyright (c) 2020-2023 J.F. Dockes
+ * Copyright (c) 2020-2025 J.F. Dockes 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -308,8 +308,7 @@ static int create_ssdp_sock_v4(SOCKET *ssdpSock)
     }
 
     onOff = 1;
-    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEADDR,
-                     reinterpret_cast<char *>(&onOff), sizeof(onOff));
+    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEADDR, &onOff, sizeof(onOff));
     if (ret == -1) {
         errorcause = "setsockopt() SO_REUSEADDR";
         goto error_handler;
@@ -317,7 +316,7 @@ static int create_ssdp_sock_v4(SOCKET *ssdpSock)
 
 #if (defined(BSD) && !defined(__GNU__)) || defined(__OSX__) || defined(__APPLE__)
     onOff = 1;
-    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<char *>(&onOff), sizeof(onOff));
+    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEPORT, &onOff, sizeof(onOff));
     if (ret == -1) {
         errorcause = "setsockopt() SO_REUSEPORT";
         goto error_handler;
@@ -348,7 +347,7 @@ static int create_ssdp_sock_v4(SOCKET *ssdpSock)
             goto error_handler;
         }
         ret = setsockopt(*ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                         reinterpret_cast<char *>(&ssdpMcastAddr), sizeof(struct ip_mreq));
+                         &ssdpMcastAddr, sizeof(struct ip_mreq));
         if (ret == -1) {
             errorcause = "setsockopt() IP_ADD_MEMBERSHIP";
             goto error_handler;
@@ -382,22 +381,14 @@ static int sock_make_no_blocking(SOCKET sock)
 }
 
 // Create an IPV4 multicast datagram socket for the CP to emit search requests and receive
-// unicast responses on a given interface (designated by sadrv4)
-static int create_ssdp_sock_reqv4(const std::string& sadrv4, SOCKET* ssdpReqSock, int port)
+// unicast responses on a given interface.
+static int create_ssdp_sock_reqv4(const NetIF::IPAddr *ip, SOCKET* ssdpReqSock, int port)
 {
     char ttl = 2;
     int ret = UPNP_E_SOCKET_ERROR;
-
-    *ssdpReqSock = INVALID_SOCKET;
-
-    uint32_t hostaddrv4;
     std::string errorcause;
-
-    if (inet_pton(AF_INET, sadrv4.c_str(), &hostaddrv4) != 1) {
-        errorcause = "inet_pton() error";
-        ret = UPNP_E_INVALID_PARAM;
-        goto error_handler;
-    }
+    const struct in_addr* addr =
+        &(reinterpret_cast<const struct sockaddr_in*>(&ip->getaddr()))->sin_addr;
 
     *ssdpReqSock = socket(AF_INET, SOCK_DGRAM, 0);
     if (*ssdpReqSock == INVALID_SOCKET) {
@@ -405,8 +396,7 @@ static int create_ssdp_sock_reqv4(const std::string& sadrv4, SOCKET* ssdpReqSock
         ret = UPNP_E_OUTOF_SOCKET;
         goto error_handler;
     }
-    if (setsockopt(*ssdpReqSock, IPPROTO_IP, IP_MULTICAST_IF,
-                   reinterpret_cast<char *>(&hostaddrv4), sizeof(hostaddrv4)) < 0) {
+    if (setsockopt(*ssdpReqSock, IPPROTO_IP, IP_MULTICAST_IF, addr, sizeof(*addr)) < 0) {
         errorcause = "setsockopt(IP_MULTICAST_IF)";
         goto error_handler;
     }
@@ -417,6 +407,9 @@ static int create_ssdp_sock_reqv4(const std::string& sadrv4, SOCKET* ssdpReqSock
 
     sock_make_no_blocking(*ssdpReqSock);
 
+    // Bind the socket to a specific port. These sockets used to be unbound, with a random port
+    // attributed on first send, but an explicit binding to ports in our configured port range
+    // helps with firewall configuration.
     if (port > 0) {
         struct sockaddr_storage ss = {};
         auto ssdpAddr4 = reinterpret_cast<struct sockaddr_in *>(&ss);
@@ -463,8 +456,7 @@ static int create_ssdp_sock_v6(bool isulagua, SOCKET *ssdpSock)
     }
 
     onOff = 1;
-    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEADDR,
-                     reinterpret_cast<char *>(&onOff), sizeof(onOff));
+    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEADDR, &onOff, sizeof(onOff));
     if (ret == -1) {
         errorcause = "setsockopt() SO_REUSEADDR";
         goto error_handler;
@@ -472,8 +464,7 @@ static int create_ssdp_sock_v6(bool isulagua, SOCKET *ssdpSock)
 
 #if (defined(BSD) && !defined(__GNU__)) || defined(__OSX__) || defined(__APPLE__)
     onOff = 1;
-    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEPORT,
-                     reinterpret_cast<char *>(&onOff), sizeof(onOff));
+    ret = setsockopt(*ssdpSock, SOL_SOCKET, SO_REUSEPORT, &onOff, sizeof(onOff));
     if (ret == -1) {
         errorcause = "setsockopt() SO_REUSEPORT";
         goto error_handler;
@@ -481,8 +472,7 @@ static int create_ssdp_sock_v6(bool isulagua, SOCKET *ssdpSock)
 #endif /* BSD, __OSX__, __APPLE__ */
 
     onOff = 1;
-    ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_V6ONLY,
-                     reinterpret_cast<char *>(&onOff), sizeof(onOff));
+    ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_V6ONLY, &onOff, sizeof(onOff));
     if (ret == -1) {
         errorcause = "setsockopt() IPV6_V6ONLY";
         goto error_handler;
@@ -508,7 +498,7 @@ static int create_ssdp_sock_v6(bool isulagua, SOCKET *ssdpSock)
         memcpy(&ssdpMcastAddr.ipv6mr_multiaddr, &sa6.sin6_addr,
                 sizeof(ssdpMcastAddr.ipv6mr_multiaddr));
         ret = setsockopt(*ssdpSock, IPPROTO_IPV6, IPV6_JOIN_GROUP,
-                         reinterpret_cast<char *>(&ssdpMcastAddr), sizeof(ssdpMcastAddr));
+                         &ssdpMcastAddr, sizeof(ssdpMcastAddr));
         if (ret == -1) {
             errorcause = "setsockopt() IPV6_JOIN_GROUP";
             goto error_handler;
@@ -549,26 +539,24 @@ static int create_ssdp_sock_reqv6(int index, SOCKET* ssdpReqSock, int port)
         ret = UPNP_E_OUTOF_SOCKET;
         goto error_handler;
     }
-    if (setsockopt(*ssdpReqSock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
-                   reinterpret_cast<char *>(&index), sizeof(index)) < 0) {
+    if (setsockopt(*ssdpReqSock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
         errorcause = "setsockopt(IPV6_MULTICAST_IF)";
         goto error_handler;
     }
 
-    if (setsockopt(*ssdpReqSock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                   reinterpret_cast<char *>(&hops), sizeof(hops)) < 0) {
+    if (setsockopt(*ssdpReqSock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, sizeof(hops)) < 0) {
         errorcause = "setsockopt(IPV6_MULTICAST_HOPS)";
         goto error_handler;
     }
 
     sock_make_no_blocking(*ssdpReqSock);
 
+    // See comment on the v4 version
     if (port > 0) {
         int onOff = 1;
 
         // Set IPV6 socket to only bind to IPV6 (Linux Dual Stack)
-        ret = setsockopt(*ssdpReqSock, IPPROTO_IPV6, IPV6_V6ONLY,
-                         reinterpret_cast<char *>(&onOff), sizeof(onOff));
+        ret = setsockopt(*ssdpReqSock, IPPROTO_IPV6, IPV6_V6ONLY, &onOff, sizeof(onOff));
 
         if (ret == -1) {
             errorcause = "setsockopt() IPV6_V6ONLY";
@@ -637,7 +625,6 @@ static void closeSockets(MiniServerSockArray *sockets, int doclose)
 
 int get_ssdp_req_socket_v4_for_netif(SOCKET& socket, const NetIF::Interface& netif, int port)
 {
-    std::string sadrv4;
     const NetIF::IPAddr *ip = netif.firstipv4addr();
 
     // No ip addr on iface ?
@@ -646,8 +633,7 @@ int get_ssdp_req_socket_v4_for_netif(SOCKET& socket, const NetIF::Interface& net
         return UPNP_E_SOCKET_ERROR;
     }
 
-    sadrv4 = ip->straddr();
-    int retVal = create_ssdp_sock_reqv4(sadrv4, &socket, port);
+    int retVal = create_ssdp_sock_reqv4(ip, &socket, port);
 
     // Failed to create socket ?
     if (retVal != UPNP_E_SUCCESS) {

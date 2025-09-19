@@ -43,16 +43,14 @@
 struct MiniServerSockArray {
     /*! Socket for stopping miniserver */
     SOCKET miniServerStopSock{INVALID_SOCKET};
-    /*! IPv4 SSDP Socket for incoming advertisments and search requests. */
+    /*! IPv4 SSDP Socket for incoming multicast advertisements and search requests. */
     SOCKET ssdpSock4{INVALID_SOCKET};
-    /*! IPv6 SSDP Socket for incoming advertisments and search requests. */
+    /*! IPv6 SSDP Socket for incoming multicast advertisements and search requests. */
     SOCKET ssdpSock6{INVALID_SOCKET};
-    /*! IPv6 SSDP Socket for incoming advertisments and search requests. */
+    /*! IPv6 SSDP Socket for incoming multicast advertisements and search requests. */
     SOCKET ssdpSock6UlaGua{INVALID_SOCKET};
 
     uint16_t stopPort{0};
-    uint16_t miniServerPort4{0};
-    uint16_t miniServerPort6{0};
 #ifdef INCLUDE_CLIENT_APIS
     /*! SSDP sockets for sending search requests and receiving search replies */
     std::vector<SOCKET> ssdpReqSock4List {};

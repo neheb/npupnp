@@ -3,6 +3,7 @@
  * Copyright (c) 2000-2003 Intel Corporation
  * All rights reserved.
  * Copyright (C) 2011-2012 France Telecom All rights reserved.
+ * Copyright (c) 2020-2025 J.F. Dockes 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -53,8 +54,7 @@
 
 struct SsdpSearchReply {
     SsdpSearchReply(int a, UpnpDevice_Handle h, const sockaddr_storage* da, SsdpEntity e)
-        : MaxAge(a), handle(h), event(std::move(e))
-    {
+        : MaxAge(a), handle(h), event(std::move(e)) {
         std::memcpy(&dest_addr, da, sizeof(dest_addr));
     }
     int MaxAge;
@@ -162,31 +162,20 @@ void ssdp_handle_device_request(const SSDPPacketParser& parser, struct sockaddr_
 
 // Create the reply socket and determine the appropriate host address
 // for setting the LOCATION header
-static SOCKET createMulticastSocket4(
-    const struct sockaddr_in *srcaddr, std::string& lochost)
+static SOCKET createMulticastSocket4(const struct sockaddr_in *srcaddr, std::string& lochost)
 {
     char ttl = 2;
-#ifdef _WIN32
-    BOOL bcast = TRUE;
-#else
-    int bcast = 1;
-#endif
-    const NetIF::IPAddr
-        ipaddr(reinterpret_cast<const struct sockaddr *>(srcaddr));
+    const NetIF::IPAddr ipaddr(reinterpret_cast<const struct sockaddr *>(srcaddr));
     lochost = ipaddr.straddr();
     SOCKET sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock == INVALID_SOCKET) {
         return INVALID_SOCKET;
     }
     uint32_t srcAddr = srcaddr->sin_addr.s_addr;
-    if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF,
-                   reinterpret_cast<char *>(&srcAddr), sizeof(srcAddr)) < 0) {
+    if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, &srcAddr, sizeof(srcAddr)) < 0) {
         goto error;
     }
     if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) < 0) {
-        goto error;
-    }
-    if(setsockopt(sock, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<char *>(&bcast), sizeof(bcast)) < 0) {
         goto error;
     }
     if (bind(sock, reinterpret_cast<const struct sockaddr *>(srcaddr),
@@ -199,8 +188,7 @@ error:
     return INVALID_SOCKET;
 }
 
-static SOCKET createReplySocket4(
-    struct sockaddr_in *destaddr, std::string& lochost)
+static SOCKET createReplySocket4(struct sockaddr_in *destaddr, std::string& lochost)
 {
     SOCKET sock = socket(static_cast<int>(destaddr->sin_family), SOCK_DGRAM, 0);
     if (sock == INVALID_SOCKET) {
@@ -232,19 +220,16 @@ static SOCKET createMulticastSocket6(int index, std::string& lochost)
     if (sock == INVALID_SOCKET) {
         return INVALID_SOCKET;
     }
-    if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_IF,
-                   reinterpret_cast<char *>(&index), sizeof(index)) < 0) {
+    if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
         goto error;
     }
-    if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                   reinterpret_cast<char *>(&hops), sizeof(hops)) < 0) {
+    if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, sizeof(hops)) < 0) {
         goto error;
     }
     lochost.clear();
     for (const auto& netif : g_netifs) {
         if (netif.getindex() == index) {
-            const auto ipaddr =
-                netif.firstipv6addr(NetIF::IPAddr::Scope::LINK);
+            const auto ipaddr = netif.firstipv6addr(NetIF::IPAddr::Scope::LINK);
             if (ipaddr) {
                 lochost = strInBrackets(ipaddr->straddr());
                 break;
@@ -260,8 +245,7 @@ error:
     return INVALID_SOCKET;
 }
 
-static SOCKET createReplySocket6(
-    const struct sockaddr_in6 *destaddr, std::string& lochost)
+static SOCKET createReplySocket6(const struct sockaddr_in6 *destaddr, std::string& lochost)
 {
     SOCKET sock = socket(AF_INET6, SOCK_DGRAM, 0);
     if (sock == INVALID_SOCKET) {
@@ -271,8 +255,7 @@ static SOCKET createReplySocket6(
     lochost.clear();
     for (const auto& netif : g_netifs) {
         if (netif.getindex() == index) {
-            const auto ipaddr =
-                netif.firstipv6addr(NetIF::IPAddr::Scope::LINK);
+            const auto ipaddr = netif.firstipv6addr(NetIF::IPAddr::Scope::LINK);
             if (ipaddr) {
                 lochost = strInBrackets(ipaddr->straddr());
                 break;
@@ -285,8 +268,7 @@ static SOCKET createReplySocket6(
     return sock;
 }
 #else // ! ENABLE_IPV6 ->
-static SOCKET createReplySocket6(
-    struct sockaddr_in6 *destaddr, std::string& lochost)
+static SOCKET createReplySocket6(struct sockaddr_in6 *destaddr, std::string& lochost)
 {
     return INVALID_SOCKET;
 }
@@ -840,9 +822,8 @@ int AdvertiseAndReply(UpnpDevice_Handle Hnd, SSDPDevMessageType tp, int Exp,
                 if (ipaddr.family() != NetIF::IPAddr::Family::IPV4)
                     continue;
                 const struct sockaddr_storage& fss{ipaddr.getaddr()};
-                sock = createMulticastSocket4(
-                    reinterpret_cast<const struct sockaddr_in*>(&fss),
-                    lochost);
+                sock = createMulticastSocket4(reinterpret_cast<const struct sockaddr_in*>(&fss),
+                                              lochost);
                 if (sock == INVALID_SOCKET) {
                     goto exitfunc;
                 }
@@ -855,15 +836,12 @@ int AdvertiseAndReply(UpnpDevice_Handle Hnd, SSDPDevMessageType tp, int Exp,
         }
     } else {
         sock = repDestAddr->ss_family == AF_INET ?
-            createReplySocket4(
-                reinterpret_cast<struct sockaddr_in*>(repDestAddr), lochost) :
-            createReplySocket6(
-                reinterpret_cast<struct sockaddr_in6*>(repDestAddr), lochost);
+            createReplySocket4(reinterpret_cast<struct sockaddr_in*>(repDestAddr), lochost) :
+            createReplySocket6(reinterpret_cast<struct sockaddr_in6*>(repDestAddr), lochost);
         if (sock == INVALID_SOCKET) {
             goto exitfunc;
         }
-        ret = AdvertiseAndReplyOneDest(
-            Hnd, tp, Exp, repDestAddr, sdata, sock, lochost);
+        ret = AdvertiseAndReplyOneDest(Hnd, tp, Exp, repDestAddr, sdata, sock, lochost);
     }
 
 exitfunc:
