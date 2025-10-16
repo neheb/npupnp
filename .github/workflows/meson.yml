@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        cxx: ['9', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
+        cxx: ['9', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22']
     steps:
       - uses: actions/checkout@v4
       - uses: egor-tensin/setup-clang@v1
