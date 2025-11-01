@@ -53,7 +53,7 @@ nnn * Redistribution and use in source and binary forms, with or without
 /*! Structure to contain Discovery response. */
 struct ResultData {
     explicit ResultData(Upnp_Discovery p, void* c, Upnp_FunPtr f) :
-        param(p), cookie(c), ctrlpt_callback(f) {}
+        param(std::move(p)), cookie(c), ctrlpt_callback(f) {}
     struct Upnp_Discovery param;
     void *cookie;
     Upnp_FunPtr ctrlpt_callback;

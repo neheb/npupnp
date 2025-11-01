@@ -771,11 +771,11 @@ std::ostream& Interfaces::print(std::ostream& out) {
 std::vector<Interface> Interfaces::select(const Filter& filt) const
 {
     uint32_t yesflags = std::accumulate(filt.needs.begin(), filt.needs.end(), 0,
-        [](uint32_t yes, const NetIF::Interface::Flags &f){
+        [](uint32_t yes, NetIF::Interface::Flags f){
             return yes | static_cast<unsigned int>(f); });
 
     uint32_t noflags = std::accumulate(filt.rejects.begin(), filt.rejects.end(), 0,
-        [](uint32_t no, const NetIF::Interface::Flags &f){
+        [](uint32_t no, NetIF::Interface::Flags f){
             return no | static_cast<unsigned int>(f); });
 
     LOGDEB("Interfaces::select: yesflags " << std::hex << yesflags <<

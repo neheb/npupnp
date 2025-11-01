@@ -330,7 +330,7 @@ static int sendPackets(SOCKET sock, struct sockaddr_storage *daddr, int cnt, std
 static void CreateServicePacket(
     SSDPDevMessageType msg_type, const char *nt, const char *usn,
     const std::string& location, int duration, std::string &packet,
-    int AddressFamily, const SSDPPwrState& pwr, const std::string& prodvers)
+    int AddressFamily, SSDPPwrState pwr, const std::string& prodvers)
 {
     std::ostringstream str;
     switch (msg_type) {
