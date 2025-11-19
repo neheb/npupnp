@@ -499,6 +499,12 @@ size_t write_callback_null_curl(char *buffer, size_t size, size_t nitems, std::s
 // Not worth including upnpapi.h just for this.
 extern size_t g_maxContentLength;
 
+// Needed with older Curl releases (e.g. Debian bullseye). Actually, according to curl.h comments,
+// any value differing from the input size will halt the transfer.
+#ifndef CURL_WRITEFUNC_ERROR
+#define CURL_WRITEFUNC_ERROR 0xFFFFFFFF
+#endif
+
 size_t write_callback_str_curl(char *buf, size_t sz, size_t nits, std::string *s)
 {
     if (s->size() + sz * nits > g_maxContentLength) {
