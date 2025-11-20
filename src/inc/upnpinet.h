@@ -35,4 +35,16 @@ typedef int SOCKET;
 
 #endif /* ! _WIN32 */
 
+
+/* Helper: the Windows socket API wants the last arg to setsockopt to be a char *, which
+   would force cluttering the code with casts everywhere. Use a dummy function instead */
+static inline int np_setsockopt(
+    SOCKET sockfd, int level, int optname, const void *optval, socklen_t optlen) {
+#ifdef _WIN32
+    return setsockopt(sockfd, level, optname, reinterpret_cast<const char*>(optval), optlen);
+#else
+    return setsockopt(sockfd, level, optname, optval, optlen);
+#endif
+}
+
 #endif /* UPNPINET_H */

@@ -2,7 +2,7 @@ project(
   'libnpupnp',
   'cpp',
   license: 'BSD-3-Clause',
-  version: '6.2.2',
+  version: '6.2.3',
   default_options: 'cpp_std=c++17',
   meson_version: '>=0.49',
 )

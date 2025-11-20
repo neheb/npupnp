@@ -172,10 +172,10 @@ static SOCKET createMulticastSocket4(const struct sockaddr_in *srcaddr, std::str
         return INVALID_SOCKET;
     }
     uint32_t srcAddr = srcaddr->sin_addr.s_addr;
-    if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, &srcAddr, sizeof(srcAddr)) < 0) {
+    if (np_setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, &srcAddr, sizeof(srcAddr)) < 0) {
         goto error;
     }
-    if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) < 0) {
+    if (np_setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) < 0) {
         goto error;
     }
     if (bind(sock, reinterpret_cast<const struct sockaddr *>(srcaddr),
@@ -220,10 +220,10 @@ static SOCKET createMulticastSocket6(int index, std::string& lochost)
     if (sock == INVALID_SOCKET) {
         return INVALID_SOCKET;
     }
-    if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
+    if (np_setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
         goto error;
     }
-    if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, sizeof(hops)) < 0) {
+    if (np_setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, sizeof(hops)) < 0) {
         goto error;
     }
     lochost.clear();
