@@ -1,10 +1,10 @@
-libnpupnp (6.2.2-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
+libnpupnp (6.2.3-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
 
   * ipv6 and ssdp code cleanup
   * Fix rare crash after HTTP server start error.
   * Limit size of POST data to g_maxContentLength (default: 2MB).
   
- -- Jean-Francois Dockes <jf@dockes.org>  Wed, 19 Nov 2025 07:55:00 +0100
+ -- Jean-Francois Dockes <jf@dockes.org>  Wed, 20 Nov 2025 14:33:00 +0100
 
 libnpupnp (6.2.1-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
 
