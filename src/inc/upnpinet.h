@@ -41,7 +41,7 @@ typedef int SOCKET;
 static inline int np_setsockopt(
     SOCKET sockfd, int level, int optname, const void *optval, socklen_t optlen) {
 #ifdef _WIN32
-    return setsockopt(sockfd, level, optname, reinterpret_cast<const char*>(optval), optlen);
+    return setsockopt(sockfd, level, optname, static_cast<const char*>(optval), optlen);
 #else
     return setsockopt(sockfd, level, optname, optval, optlen);
 #endif
