@@ -1160,7 +1160,7 @@ int UpnpRegisterClient(Upnp_FunPtr Fun, const void *Cookie, UpnpClient_Handle *H
     }
     HInfo->HType = HND_CLIENT;
     HInfo->Callback = Fun;
-    HInfo->Cookie = reinterpret_cast<char*>(const_cast<void*>(Cookie));
+    HInfo->Cookie = const_cast<void*>(Cookie);
 #ifdef INCLUDE_DEVICE_APIS
     HInfo->MaxAge = 0;
     HInfo->MaxSubscriptions = UPNP_INFINITE;

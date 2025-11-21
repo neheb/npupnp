@@ -675,7 +675,7 @@ static int available_port(int reqport)
     }
     int onOff = 1;
     if (np_setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-                      reinterpret_cast<char *>(&onOff), sizeof(onOff)) < 0) {
+                      &onOff, sizeof(onOff)) < 0) {
         std::string errorDesc;
         NetIF::getLastError(errorDesc);
         UpnpPrintf(UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
