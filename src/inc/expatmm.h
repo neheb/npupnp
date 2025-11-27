@@ -23,6 +23,7 @@
 #ifndef _EXPATMM_EXPATXMLPARSER_H
 #define _EXPATMM_EXPATXMLPARSER_H
 
+#include <stdio.h>
 #include <expat.h>
 
 #include <cstring>
