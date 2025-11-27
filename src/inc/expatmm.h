@@ -126,6 +126,9 @@ public:
     virtual XML_Size getLastErrorColumn(void) const {
         return last_error_column;
     }
+    virtual XML_Index getCurrentByteIndex(void) const {
+        return XML_GetCurrentByteIndex(expat_parser);
+    }
     virtual std::string getLastErrorMessage(void) const {
         return last_error_message;
     }
