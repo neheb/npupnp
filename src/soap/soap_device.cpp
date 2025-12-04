@@ -179,6 +179,8 @@ public:
     std::string outxml;
 
 protected:
+    /* !! Beware: if changed to use the attrs, and using picoxml, need to define
+       PICOXML_EXPAT_STARTELEMENT_COMPAT before the picoxml.h include */
     void StartElement(const XML_Char *name, const XML_Char**) override {
         if (!m_isresp && m_path.size() >= 3) {
             outxml += std::string("<") + name + ">";
