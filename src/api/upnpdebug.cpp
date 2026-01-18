@@ -33,6 +33,7 @@
 
 #include "upnp.h"
 #include "upnpdebug.h"
+#include "smallut.h"
 
 #include <cstdarg>
 #include <cstdlib>
@@ -43,6 +44,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <vector>
 
 /* Mutex to synchronize all the log file operations in the debug mode */
 static std::mutex GlobalDebugMutex;
@@ -58,6 +60,76 @@ static int o_is_stderr;
 static int o_setlogwascalled;
 /* Name of the output file. We keep a copy */
 static std::string o_fileName;
+
+enum SubSysDebugFlag {SSDF_NONE=0, SSDF_SSDP=0x1, SSDF_SOAP=0x2, SSDF_GENA=0x4, SSDF_TPOOL=0x8,
+                      SSDF_MSERV=0x10, SSDF_DOM=0x20, SSDF_HTTP=0x40, SSDF_ALL=0xFFFF};
+
+static unsigned int subsysdebug = SSDF_ALL;
+static bool subsysdone;
+
+static void setModuleFlags()
+{
+    const char *cp = getenv("NPUPNP_DEBUGMODULES");
+    if (cp) {
+        std::string scp(cp);
+        bool neg = false;
+        if (!scp.empty() && scp[0] == '-') {
+            neg = true;
+            subsysdebug = SSDF_ALL;
+        } else {
+            subsysdebug = SSDF_NONE;
+        }
+        if (neg)
+            scp = scp.substr(1);
+        std::vector<std::string> modules;
+        stringToStrings(scp, modules, ",;");
+        for (const auto& mod : modules) {
+            if (mod == "SSDP") {
+                if (neg) {
+                    subsysdebug &= ~SSDF_SSDP;
+                } else {
+                    subsysdebug |= SSDF_SSDP;
+                }
+            } else if (mod == "SOAP") {
+                if (neg) {
+                    subsysdebug &= ~SSDF_SOAP;
+                } else {
+                    subsysdebug |= SSDF_SOAP;
+                }
+            } else if (mod == "GENA") {
+                if (neg) {
+                    subsysdebug &= ~SSDF_GENA;
+                } else {
+                    subsysdebug |= SSDF_GENA;
+                }
+            } else if (mod == "TPOOL") {
+                if (neg) {
+                    subsysdebug &= ~SSDF_TPOOL;
+                } else {
+                    subsysdebug |= SSDF_TPOOL;
+                }
+            } else if (mod == "MSERV") {
+                if (neg) {
+                    subsysdebug &= ~SSDF_MSERV;
+                } else {
+                    subsysdebug |= SSDF_MSERV;
+                }
+            } else if (mod == "DOM") {
+                if (neg) {
+                    subsysdebug &= ~SSDF_DOM;
+                } else {
+                    subsysdebug |= SSDF_DOM;
+                }
+            } else if (mod == "HTTP") {
+                if (neg) {
+                    subsysdebug &= ~SSDF_HTTP;
+                } else {
+                    subsysdebug |= SSDF_HTTP;
+                }
+            }
+        }
+    }
+}
 
 /* This can be called multiple times, for example to rotate the log file.*/
 int UpnpInitLog(void)
@@ -127,14 +199,18 @@ void UpnpSetLogFileNames(const char *newFileName, const char *ignored)
 
 static int DebugAtThisLevel(Upnp_LogLevel DLevel, Dbg_Module Module)
 {
+    if (!subsysdone) {
+        setModuleFlags();
+        subsysdone = true;
+    }
     return (DLevel <= g_log_level) &&
-        (DEBUG_ALL ||
-         (Module == SSDP && DEBUG_SSDP) ||
-         (Module == SOAP && DEBUG_SOAP) ||
-         (Module == GENA && DEBUG_GENA) ||
-         (Module == TPOOL && DEBUG_TPOOL) ||
-         (Module == MSERV && DEBUG_MSERV) ||
-         (Module == DOM && DEBUG_DOM) || (Module == HTTP && DEBUG_HTTP));
+        ( (Module == SSDP && (subsysdebug & SSDF_SSDP)) ||
+          (Module == SOAP && (subsysdebug & SSDF_SOAP)) ||
+          (Module == GENA && (subsysdebug & SSDF_GENA)) ||
+          (Module == TPOOL && (subsysdebug & SSDF_TPOOL)) ||
+          (Module == MSERV && (subsysdebug & SSDF_MSERV)) ||
+          (Module == DOM && (subsysdebug & SSDF_DOM)) ||
+          (Module == HTTP && (subsysdebug & SSDF_HTTP)));
 }
 
 static void UpnpDisplayFileAndLine(
