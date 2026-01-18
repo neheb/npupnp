@@ -629,16 +629,17 @@ private:
 
 void gena_process_notification_event(MHDTransaction *mhdt)
 {
-    UpnpPrintf(UPNP_ALL, GENA, __FILE__, __LINE__, "gena_process_notification_event\n");
-
-    auto itsid = mhdt->headers.find("sid");
     /* get SID */
+    auto itsid = mhdt->headers.find("sid");
     if (itsid == mhdt->headers.end()) {
         http_SendStatusResponse(mhdt, HTTP_PRECONDITION_FAILED);
         UpnpPrintf(UPNP_DEBUG,GENA,__FILE__,__LINE__, "gena_process_notification_event: no SID\n");
         return;
     }
     const std::string& sid = itsid->second;
+    UpnpPrintf(UPNP_ALL, GENA, __FILE__, __LINE__, "gena_process_notification_event. SID [%s]\n",
+               sid.c_str());
+
 
     auto itseq = mhdt->headers.find("seq");
     /* get event key */
@@ -688,6 +689,14 @@ void gena_process_notification_event(MHDTransaction *mhdt)
                    mhdt->postdata.c_str());
         return;
     }
+    if (nullptr != UpnpGetDebugFile(UPNP_ALL, GENA)) {
+        // Using getdebugfile above to test the log level avoids running the loop for nothing.
+        for (const auto& [nm, value] : propset) {
+            UpnpPrintf(UPNP_ALL, GENA, __FILE__, __LINE__,
+                       "gena_process_notification_event: [%s] -> [%s]\n", nm.c_str(), value.c_str());
+        }
+    }
+
     globalHndLock.lock();
 
     /* get client info */
