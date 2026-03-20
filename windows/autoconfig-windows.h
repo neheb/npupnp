@@ -46,7 +46,7 @@
 #define UPNP_HAVE_WEBSERVER 1
 
 /* Use expat */
-#define USE_EXPAT 1
+#undef USE_EXPAT 
 
 /* File Offset size */
 #define _FILE_OFFSET_BITS 64

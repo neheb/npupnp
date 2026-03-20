@@ -126,7 +126,6 @@ meson.build
 meson_options.txt
 qmk/
 qmk/libnpupnp.pro
-qmk/libnpupnp.pro.user
 src/
 src/api/
 src/api/upnpapi.cpp

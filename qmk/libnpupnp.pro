@@ -45,19 +45,10 @@ windows {
     DEFINES += CURL_STATICLIB
     DEFINES += PSAPI_VERSION=1
 
-    ## W7 with mingw
-    contains(QMAKE_CC, gcc){
-      INCLUDEPATH += $$PWD/../../expat-2.1.0/lib
-      INCLUDEPATH += $$PWD/../../curl-7.70.0/include
-      INCLUDEPATH += $$PWD/../../libmicrohttpd-0.9.65/src/include
-      QMAKE_CXXFLAGS += -std=c++17 -Wno-unused-parameter
-    }
-
     # W10 with msvc 2017
     contains(QMAKE_CC, cl){
       QMAKE_CXXFLAGS += /std:c++17
       DEFINES += NOMINMAX
-      INCLUDEPATH += $$PWD/../../expat.v140.2.4.1.1/build/native/include
       INCLUDEPATH += $$PWD/../../curl-7.70.0/include
       INCLUDEPATH += $$PWD/../../libmicrohttpd-0.9.65-w32-bin/x86_64/VS2019/Release-dll/
     }

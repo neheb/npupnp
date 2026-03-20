@@ -8,7 +8,6 @@ Maintainer: Jean-Francois Dockes <jf@dockes.org>
 Build-Depends: debhelper-compat (=12),
                pkg-config,
                meson,
-               libexpat1-dev,
                libmicrohttpd-dev,
                libcurl4-gnutls-dev
 Rules-Requires-Root: no

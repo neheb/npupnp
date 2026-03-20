@@ -1,3 +1,11 @@
+libnpupnp (6.3.0-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
+
+  * Disable expat usage by default. Seems to work fine with the internal
+    XML parser.
+  * Improve logging subsystem (switch subsystems logging through environ)
+  
+ -- Jean-Francois Dockes <jf@dockes.org>  Fri, 20 Mar 2026 09:10:00 +0100
+
 libnpupnp (6.2.3-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
 
   * ipv6 and ssdp code cleanup

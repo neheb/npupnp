@@ -44,6 +44,7 @@ option('webserver', type : 'boolean',
 )
 
 option('expat', type : 'feature',
+  value : 'disabled',
   description : 'Use expat',
 )
 
