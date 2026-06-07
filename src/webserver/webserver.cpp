@@ -499,7 +499,7 @@ static int process_request(
             qs.pop_back();
         }
         std::string bfilename{filename};
-        filename += qs;
+        filename = query_encode(filename, true) + qs;
         /* get file info */
         if (virtualDirCallback.get_info(filename.c_str(), &finfo, entryp->cookie,
                                         &RespInstr->request_cookie) != UPNP_E_SUCCESS) {
@@ -514,7 +514,7 @@ static int process_request(
                 temp_str = "/index.html";
             }
             bfilename += temp_str;
-            filename = bfilename + qs;
+            filename = query_encode(bfilename, true) + qs;
             /* get info */
             if ((virtualDirCallback.get_info(filename.c_str(), &finfo, entryp->cookie,
                                              &RespInstr->request_cookie) != UPNP_E_SUCCESS) ||

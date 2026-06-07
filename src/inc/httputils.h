@@ -67,7 +67,7 @@ http_method_t httpmethod_str2enum(const char *methname);
  * always lower-cased, and lower case is expected by the function */
 int httpheader_str2int(const std::string& headername);
 
-std::string query_encode(const std::string& qs);
+std::string query_encode(const std::string& qs, bool preserve_slash=false);
 
 /* Context for a microhttpd request/response */
 struct MHDTransaction {

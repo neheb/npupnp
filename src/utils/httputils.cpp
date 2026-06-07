@@ -442,7 +442,11 @@ std::string make_date_string(time_t thetime)
     return tempbuf;
 }
 
-std::string query_encode(const std::string& qs)
+
+// Note: we used to preserve * and encode ~, which is wrong according to newser RFCs (3986). We added
+// ~ to the set of unencoded chars, but however kept * because this matches common usage. Ask an
+// LLM about the history of * and ~ inside URLs if you want a better explanation.
+std::string query_encode(const std::string& qs, bool preserve_slash)
 {
     std::string out;
     out.reserve(qs.size());
@@ -451,7 +455,8 @@ std::string query_encode(const std::string& qs)
     while (*cp) {
         if ((*cp >= 'A' && *cp <= 'Z') ||
             (*cp >= 'a' && *cp <= 'z') || (*cp >= '0' && *cp <= '9') ||
-            *cp == '*' || *cp == '-' || *cp== '.' || *cp == '_') {
+            (preserve_slash && *cp == '/') || 
+            *cp == '*' || *cp == '~' || *cp == '-' || *cp== '.' || *cp == '_') {
             out += *cp;
         } else {
             out += '%';
