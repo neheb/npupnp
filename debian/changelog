@@ -1,3 +1,9 @@
+libnpupnp (6.3.1-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
+
+  * Fix crash when receiving HTTP query with empty parameter.
+  
+ -- Jean-Francois Dockes <jf@dockes.org>  Fri, 13 Nov 2026 16:32:00 +0100
+
 libnpupnp (6.3.0-1~ppaPPAVERS~SERIES1) SERIES; urgency=low
 
   * Disable expat usage by default. Seems to work fine with the internal
