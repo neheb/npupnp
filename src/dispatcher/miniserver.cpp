@@ -119,10 +119,16 @@ static void fdset_if_valid(SOCKET sock, fd_set* set)
     }
 }
 
-static MHD_Result headers_cb(void *cls, enum MHD_ValueKind, const char *k, const char *value)
+static std::string makeastring(const char *cp)
+{
+    return cp ? cp : std::string();
+}
+
+static MHD_Result headers_cb(void *cls, enum MHD_ValueKind, const char *_key, const char *_value)
 {
     auto mhtt = static_cast<MHDTransaction *>(cls);
-    std::string key(k);
+    std::string key = makeastring(_key);
+    std::string value = makeastring(_value);
     stringtolower(key);
     // It is always possible to combine multiple identically named headers
     // name into one comma separated list. See HTTP 1.1 section 4.2
@@ -133,7 +139,7 @@ static MHD_Result headers_cb(void *cls, enum MHD_ValueKind, const char *k, const
         mhtt->headers[key] = value;
     }
     UpnpPrintf(UPNP_DEBUG, MSERV, __FILE__, __LINE__,
-               "miniserver:req_header: [%s: %s]\n",    key.c_str(), value);
+               "miniserver:req_header: [%s: %s]\n",    key.c_str(), value.c_str());
     return MHD_YES;
 }
 
@@ -146,12 +152,16 @@ static MHD_Result show_resp_headers_cb(
 }
 
 static MHD_Result queryvalues_cb(void *cls, enum MHD_ValueKind,
-                                 const char *key, const char *value)
+                                 const char *_key, const char *_value)
 {
     auto mhdt = static_cast<MHDTransaction *>(cls);
+
+    std::string key = makeastring(_key);
+    std::string value = makeastring(_value);
+
     if (mhdt) {
         UpnpPrintf(UPNP_ALL, MSERV, __FILE__, __LINE__,
-                   "miniserver:request value: [%s: %s]\n", key, value);
+                   "miniserver:request value: [%s: %s]\n", key.c_str(), value.c_str());
         mhdt->queryvalues[key] = value;
     }
     return MHD_YES;
