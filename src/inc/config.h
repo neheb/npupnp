@@ -47,9 +47,11 @@
 #endif
 
 #ifdef _MSC_VER
-/* no ssize_t defined for VC */
-#include <cstdint>
-typedef intptr_t ssize_t;
+#include <BaseTsd.h>
+#ifndef _SSIZE_T_DEFINED
+typedef SSIZE_T ssize_t;
+#define _SSIZE_T_DEFINED
+#endif
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
 #define getpid _getpid

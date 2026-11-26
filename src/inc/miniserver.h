@@ -34,8 +34,6 @@
 
 #include "config.h"
 
-#include <cstdint>
-
 #include "httputils.h"
 #include "upnpinet.h"
 #include <vector>

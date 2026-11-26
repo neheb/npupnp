@@ -37,7 +37,6 @@
 /** @file upnp.h
  * @brief main libnpupnp API definitions */
 
-#include <cstdint>
 #include <ctime>
 #include <map>
 #include <string>
