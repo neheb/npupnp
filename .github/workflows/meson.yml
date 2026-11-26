@@ -181,7 +181,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: vmactions/netbsd-vm@v1
         with:
-          release: '9.0'
           prepare: |
             /usr/sbin/pkg_add curl meson pkgconf libmicrohttpd
           run: |
@@ -212,7 +211,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jirutka/setup-alpine@v1
         with:
-          branch: edge
           arch: ${{matrix.platform}}
           packages: >
             build-base curl-dev expat-dev libmicrohttpd-dev linux-headers pkgconf meson samurai
