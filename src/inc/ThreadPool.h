@@ -125,7 +125,7 @@ struct ThreadPoolStats {
  */
 class ThreadPool {
 public:
-    enum ThreadPriority : uint16_t {LOW_PRIORITY, MED_PRIORITY, HIGH_PRIORITY};
+    enum ThreadPriority : unsigned short {LOW_PRIORITY, MED_PRIORITY, HIGH_PRIORITY};
 
     ThreadPool();
     // See comments in undef'd out destructor in ThreadPool.cpp
